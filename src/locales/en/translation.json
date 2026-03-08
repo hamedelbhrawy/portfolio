@@ -1,0 +1,18 @@
+{
+    "nav": {
+        "about": "About",
+        "services": "Services",
+        "portfolio": "Portfolio",
+        "blog": "Blog",
+        "bookCall": "Book a Call",
+        "home": "Home",
+        "resources": "Resources",
+        "contact": "Contact"
+    },
+    "hero": {
+        "title": "From Raw Data →",
+        "subtitle": "Reliable Decisions",
+        "cta_primary": "Book a Strategy Call",
+        "cta_secondary": "View the Playbook"
+    }
+}

@@ -1,0 +1,496 @@
+Build a premium, high-end personal portfolio and consulting website for Hamed Elbhrawy — a Senior Data Platform Architect & BI Strategy Leader based in Riyadh, Saudi Arabia. The website must feel like a top-tier technology consulting brand (think Stripe, Linear, or Vercel quality) — not a generic resume or template portfolio. Every page must demonstrate authority, drive conversions, and position Hamed as one of the leading data platform experts in the Middle East.
+
+===================================
+BRAND IDENTITY & POSITIONING
+===================================
+
+Professional Title: Senior Data Platform Architect & BI Strategy Leader
+Tagline: "From Raw Data → Reliable Decisions"
+Location: Riyadh, Saudi Arabia
+LinkedIn: linkedin.com/in/hamedelbhrawy
+GitHub: github.com/hamedelbhrawy
+
+Career Summary: 6+ years across Samsung Electronics, Huawei Technologies, EAI Company, and Deraah Retail Group. Progressed from Samsung phone promoter to Head of Analytics leading a 6-person team. Background in Accounting (B.Sc. Zagazig University). Self-taught in SQL, Power BI, and data engineering. Microsoft PL-300 certified.
+
+Core Expertise: Data Platform Architecture, Medallion Lakehouse Design, BI Strategy & Transformation, Analytics Engineering (dbt), Pipeline Orchestration (Apache Airflow 3.0), Columnar Databases (ClickHouse), Power BI (353+ DAX measures), Customer 360 Platforms, Data Governance (SDAIA/PDPL), Retail Analytics at Scale (1,200+ stores), Team Leadership.
+
+Key Impact Metrics (use these as animated counters on the homepage):
+- 259x — Faster Dashboards (ClickHouse migration)
+- $80K — Annual Cost Savings (automation)
+- 2.7M — Customer Records Unified (Customer 360)
+- 353 — DAX Measures Written (across 4 companies)
+- 32 — dbt Models in Production (Medallion Lakehouse)
+
+Value Proposition: "I help companies transform fragmented data into a modern analytics platform that delivers trusted insights, scalable pipelines, and executive-ready dashboards."
+
+Brand Personality: Authoritative but approachable. Results-obsessed (every claim backed by a number). Builder mentality (architects, builds, automates, leads). Bilingual and culturally grounded (Arabic/English, Hijri/Gregorian).
+
+Target Audience Priority:
+1. CTOs, VP of Data, Heads of Engineering, Digital Transformation Leaders
+2. Recruiters and HR for senior data roles
+3. Data professionals seeking to learn
+4. Conference and event organizers
+
+===================================
+DESIGN SYSTEM & VISUAL DIRECTION
+===================================
+
+Design Philosophy: "Cyber Corporate" — the clean sophistication of premium consulting brands combined with the technical edge of data infrastructure tools. Dark hero sections establish authority. Light content sections ensure readability. Gold accents signal premium positioning.
+
+Color Palette:
+- Primary Background (Hero/Nav/Footer): #0F172A (Midnight Navy)
+- Accent / CTA Buttons: #C5A55A (Rich Gold)
+- Secondary Accent (Tags/Badges/Code): #1ABC9C (Electric Teal)
+- Tertiary Accent (Links/Charts): #3B82F6 (Electric Blue)
+- Content Background: #FFFFFF (White)
+- Alternating Sections: #F1F5F9 (Soft Slate)
+- Body Text: #333333 (Charcoal)
+- Muted Text: #94A3B8 (Light Gray)
+
+Typography:
+- Headings (H1-H3): Plus Jakarta Sans — Bold/SemiBold/Medium
+- Body Text: DM Sans — Regular (400)
+- Metric Numbers & Code: JetBrains Mono — Bold for metrics, Regular for code
+- Arabic Text (for bilingual toggle): IBM Plex Sans Arabic
+- H1 Desktop: 48-56px | Mobile: 32-36px
+- H2 Desktop: 32-36px | Mobile: 24-28px
+- Body Desktop: 16-18px | Mobile: 15-16px
+- Metric Numbers Desktop: 48-72px | Mobile: 36-48px
+
+Layout Rules:
+- Max content width: 1200px, centered
+- Section padding: 80-120px vertical desktop, 40-60px mobile
+- Card grids: 3 columns desktop, 2 tablet, 1 mobile, 24px gap
+- Hero sections: 100vh on homepage, 60vh on inner pages
+- Asymmetric layouts: alternate text-left/visual-right with text-right/visual-left
+- Wide layout with generous whitespace — avoid cramped density
+
+Navigation:
+- Sticky top navigation bar with glass-morphism effect (frosted glass on dark navy)
+- Primary items: Home, About, Services, Portfolio, Blog, Contact
+- "More" dropdown: Case Studies, Resources, Media, Testimonials
+- Persistent gold CTA button top-right: "Book a Call"
+- EN/AR language toggle in top-right corner
+- Collapses to hamburger menu on mobile
+
+Animations & Motion:
+- Scroll-triggered fade-up animations (staggered 100ms between elements) using Framer Motion
+- Animated metric counters that count up from 0 on scroll into view
+- Horizontally scrolling tech stack logo marquee (continuous loop)
+- Card hover: translateY(-4px) with increased box-shadow
+- Typed text animation on hero subheadline cycling through: "Data Platform Architect" | "BI Strategy Leader" | "Analytics Engineer"
+- Career timeline nodes appear sequentially as user scrolls
+- Page transitions: gentle 300ms fade
+- All motion should feel premium and intentional, not playful
+
+Visual Assets:
+- Use Lucide icons exclusively throughout the site
+- No stock photos anywhere — use custom geometric shapes, gradient meshes, and abstract data-flow patterns for backgrounds
+- Dashboard mockup placeholders for portfolio items
+- Architecture diagram placeholder for the About page
+
+===================================
+PAGE 1: HOMEPAGE
+===================================
+
+Purpose: Establish authority in 5 seconds. Route visitors to the right page. This is a movie trailer for the career, not a resume.
+
+Section 1 — Hero (full viewport height, dark navy background #0F172A):
+- Headline (white, Plus Jakarta Sans Bold, 48-56px): "Architecting Modern Data Platforms That Power Business Decisions"
+- Subheadline with typed text animation cycling through: "Data Platform Architect • BI Strategy Leader • Analytics Engineering Expert"
+- Below subheadline (DM Sans, #94A3B8): "From Raw Data → Reliable Decisions"
+- Two CTA buttons side by side:
+  - Primary (gold background #C5A55A, dark text): "Explore My Work"
+  - Secondary (outlined, white border): "Download CV"
+- Professional headshot placeholder on the right side (desktop), below on mobile
+
+Section 2 — Impact Metrics Bar (dark navy or slightly lighter #1E293B background):
+- 5 animated counters in a horizontal row using JetBrains Mono Bold font in gold (#C5A55A):
+  - 259x | Faster Dashboards
+  - $80K | Annual Savings
+  - 2.7M | Records Unified
+  - 353 | DAX Measures
+  - 32 | dbt Models
+- Counters animate from 0 to final value on scroll into view
+
+Section 3 — Trusted By + Tech Stack (white background):
+- "Trusted By" heading with company logos in a row: Samsung, Huawei, EAI, Deraah Retail Group (use text placeholders styled as logo badges)
+- Below: horizontally scrolling tech stack marquee with tool names styled as badges: ClickHouse, dbt, Apache Airflow, Power BI, Airbyte, SQL Server, Python, Prometheus, Grafana
+
+Section 4 — Transformation Story (alternating soft slate #F1F5F9 background):
+- Headline: "From 6 Broken Tables to a 32-Model Production Lakehouse"
+- Two-column layout: left side text narrative, right side visual placeholder showing before/after transformation concept
+- Brief paragraph about the Deraah BI transformation journey
+- CTA link: "Read the Full Case Study →"
+
+Section 5 — Featured Projects (white background):
+- Headline: "Selected Work"
+- 3 project cards in a row:
+  - Card 1: "Enterprise BI Transformation" | Deraah | "259x faster dashboards, $80K saved" | Tag: Platform Architecture
+  - Card 2: "Customer 360 Engine" | Deraah | "2.7M records unified across 3 systems" | Tag: Customer Analytics
+  - Card 3: "Real-Time Ramadan Dashboard" | Deraah | "1,200+ stores monitored in real-time" | Tag: Data Engineering
+- Each card has: icon placeholder, project name, company, one-line impact, category tag in teal, and "View Project →" link
+- Below cards: "View All Projects →" link
+
+Section 6 — Latest Insights (soft slate background):
+- Headline: "Latest Insights"
+- 3 blog post preview cards: title, category tag, estimated read time, date placeholder
+- "View All Posts →" link
+
+Section 7 — Footer CTA (dark navy background):
+- Headline (white, large): "What Data Bottleneck Are You Trying to Solve?"
+- Subtext: "Let's discuss how a modern data platform can transform your analytics."
+- Gold CTA button: "Start a Conversation"
+
+Section 8 — Footer:
+- 4-column layout on desktop:
+  - Column 1: Name, title, tagline, location
+  - Column 2: Quick Links (Home, About, Services, Portfolio, Blog, Contact)
+  - Column 3: Resources (Case Studies, Resources, Media, Newsletter)
+  - Column 4: Connect (LinkedIn icon+link, GitHub icon+link, Email, "Book a Call" button)
+- Copyright line at bottom
+- Subtle gold top border
+
+===================================
+PAGE 2: ABOUT
+===================================
+
+Purpose: Build personal connection and trust. Show the human behind the metrics.
+
+Section 1 — Hero (60vh, dark navy):
+- Headline: "The Story Behind the Data"
+- Subheadline: "From Samsung phone promoter to enterprise data platform architect — a career built on curiosity, not credentials."
+
+Section 2 — Origin Story (white background):
+- First-person conversational narrative in 2-3 paragraphs:
+  - Studied accounting, first job as Samsung promoter, taught myself SQL at night
+  - Built first terrible dashboard, progressed through 4 companies
+  - Now leading a 6-person team transforming enterprise analytics at Deraah
+- Professional headshot beside the text
+
+Section 3 — Interactive Career Timeline (soft slate background):
+- Vertical timeline with animated nodes appearing on scroll:
+  - Samsung (2019-2022): "Promoter → Team Leader → Data Analyst. Built foundation in sales ops."
+  - Huawei (2022): "Regional Data Analyst. 15+ reports in 30 days."
+  - EAI (2022-2023): "Operations Analyst & BI Developer. 10 major BI systems in 12 months."
+  - Deraah (2023-Present): "Head of Analytics & BI Architect. 6 tables → 32-model lakehouse."
+- Each node has: date range, company name, role title, one-line achievement
+
+Section 4 — Technical Philosophy (white background):
+- Headline: "How I Think About Data"
+- 3 philosophy cards in a row with icons:
+  - "Business questions drive technology, not the other way around."
+  - "80% of the work is the data model. The dashboard is the easy part."
+  - "If it needs explanation, it is not a good dashboard."
+
+Section 5 — Architecture Showcase (soft slate background):
+- Headline: "The Platform I Build"
+- Full-width placeholder for a custom architecture diagram showing:
+  - Data Sources → Airbyte (ELT) → ClickHouse (Storage) → dbt (Transform) → Airflow (Orchestrate) → Prometheus/Grafana (Monitor) → Power BI (Visualize)
+- Brief description below the diagram
+
+Section 6 — Certifications (white background):
+- Microsoft PL-300 badge prominently displayed
+- B.Sc. Accounting, Zagazig University
+- Collapsible/accordion section for DataCamp certifications (20+ courses)
+
+Section 7 — CTAs:
+- Two buttons: "Download My Full CV" (gold) and "See My Work" (outlined)
+
+===================================
+PAGE 3: SERVICES / EXPERTISE
+===================================
+
+Purpose: Define offerings with consulting-firm clarity. Not a skill list — a services page.
+
+Section 1 — Hero (60vh, dark navy):
+- Headline: "What I Do"
+- Subheadline: "End-to-end data platform design, from audit to production."
+
+Section 2 — Four Service Pillars (white background, 2x2 grid on desktop):
+
+Card 1: "Data Platform Architecture & Transformation"
+- Description: "End-to-end BI platform design using Medallion Architecture. From audit to production lakehouse."
+- Proof callout (teal accent): "Proven at Deraah: 6 tables → 32-model production system. 259x faster. $80K saved."
+- Tools: ClickHouse, dbt, Airflow, Airbyte, SQL Server
+
+Card 2: "Analytics Leadership & Strategy"
+- Description: "Building high-performing analytics teams. 5-Year maturity roadmaps, stakeholder alignment, ROI measurement."
+- Proof callout: "Built 6-person team from scratch. 5-Year Roadmap in Year 3 execution."
+- Tools: Strategic planning, Team building, Change management
+
+Card 3: "Data Governance & Compliance"
+- Description: "Enterprise governance aligned with Saudi regulations. Classification, RBAC, cataloging, monitoring."
+- Proof callout: "10-pillar framework aligned with SDAIA and PDPL at Deraah."
+- Tools: SDAIA/PDPL, OpenMetadata, Prometheus, Grafana
+
+Card 4: "Training & Analytics Enablement"
+- Description: "Knowledge transfer for technical and non-technical teams. SQL workshops, Power BI best practices, self-service enablement."
+- Proof callout: "Taught SQL to marketing team. Enabled self-service analytics across departments."
+- Tools: Curriculum design, DAX patterns, Power Query/M
+
+Section 3 — CTA (dark navy background):
+- Headline: "Ready to Modernize Your Data Platform?"
+- Gold button: "Schedule a Free 30-Minute Audit"
+- Secondary link: "View Case Studies →"
+
+===================================
+PAGE 4: PORTFOLIO / PROJECTS
+===================================
+
+Purpose: Visual proof of delivery with measurable impact on every card.
+
+Section 1 — Hero (60vh, dark navy):
+- Headline: "Selected Work"
+- Subheadline: "Every project delivers measurable business impact."
+
+Section 2 — Filter Tabs:
+- Horizontal filter tabs: All | Platform Architecture | Customer Analytics | Data Engineering | Governance | Reporting
+- Active tab highlighted in gold
+
+Section 3 — Project Cards Grid (3 columns desktop, responsive):
+7 project cards, each with:
+- Icon/visual placeholder at top
+- Project name (bold)
+- Company name (muted)
+- Category tag badge (teal)
+- One-line impact metric
+- "View Details →" link
+- Hover effect: lift + shadow
+
+Projects:
+1. Enterprise BI Transformation | Deraah | Platform Architecture | "6 tables → 32-model Medallion Lakehouse. 259x faster. $80K saved."
+2. Customer 360 Engine | Deraah | Customer Analytics | "2.7M records unified across D365, Salesforce, OTO. RFM scoring + churn prediction."
+3. Real-Time Ramadan Dashboard | Deraah | Data Engineering | "1,200+ stores real-time. 30-min refresh, shift-aware logic, Hijri hour groups."
+4. Data Governance Framework | Deraah | Governance | "10-pillar SDAIA/PDPL framework. RBAC, OpenMetadata, automated monitoring."
+5. 5-Year Analytics Roadmap | Deraah | Strategy | "Foundation → Maturity: structured investment plan. Currently Year 3."
+6. Regional Reporting System | Huawei | Reporting | "15+ automated daily/weekly/monthly reports for Delta region."
+7. Operations BI & ERP Master Data | EAI | Data Engineering | "10 major BI systems: supply chain, Power BI, ERP."
+
+===================================
+PAGE 5: CASE STUDIES
+===================================
+
+Purpose: Deep-dive proof of expertise. Primary conversion page for executives.
+
+Section 1 — Hero (60vh, dark navy):
+- Headline: "Case Studies"
+- Subheadline: "The full story behind the transformation."
+
+Section 2 — Case Study Cards (3 large cards, vertical stack):
+Each card is a full-width preview with:
+- Project name and company
+- Hero metric (e.g., "259x Faster")
+- 2-sentence summary
+- "Read Full Case Study →" button
+
+Case Study 1: "Enterprise BI Transformation" — From 6 broken tables to a 32-model production Medallion Lakehouse. The flagship transformation story.
+Case Study 2: "Customer 360 Engine" — Unifying 2.7M customer records across D365, Salesforce, and OTO into a single identity platform.
+Case Study 3: "Real-Time Ramadan Dashboard" — Monitoring 1,200+ stores in real-time during Saudi Arabia's peak retail season.
+
+Section 3 — Individual Case Study Template Page (create a template):
+- Hero banner with project name, company, headline metric, one-line description
+- Section: "The Problem" — what was broken (specific, visceral language)
+- Section: "Discovery & Audit" — what was found during initial assessment
+- Section: "Solution Architecture" — visual diagram placeholder showing what was built
+- Section: "Implementation Journey" — timeline, challenges, key decisions
+- Section: "Results & Impact" — quantified before/after metrics in a visual grid
+- Section: "Lessons Learned" — what would be done differently
+- CTA section: "Facing a Similar Challenge?" with gold "Let's Talk" button
+
+===================================
+PAGE 6: BLOG / INSIGHTS
+===================================
+
+Purpose: Thought leadership hub. Drives organic search traffic.
+
+Section 1 — Hero (60vh, dark navy):
+- Headline: "Insights"
+- Subheadline: "Practical frameworks from 6+ years of building data platforms."
+
+Section 2 — Category Filter Tabs:
+- All | Platform Architecture | DAX & Power BI | Analytics Leadership | Data Governance | Career & Growth
+
+Section 3 — Blog Post Grid (3 columns):
+- Each post card: title, category tag, estimated read time, date, 2-line excerpt, "Read More →"
+- Placeholder for 6 blog post cards
+
+Section 4 — Individual Blog Post Template:
+- Full-width article layout, max 720px content width
+- Category tag and date at top
+- H1 title
+- Author byline with small avatar
+- Article content area
+- Inline newsletter signup CTA after the article: "Subscribe to The Data Signal — monthly insights on data platform architecture." with email input and "Subscribe" button
+- Related posts section showing 3 related articles
+- Share buttons (LinkedIn, Twitter/X)
+
+===================================
+PAGE 7: TESTIMONIALS
+===================================
+
+Purpose: Social proof wall.
+
+Section 1 — Hero (smaller, 40vh, dark navy):
+- Headline: "What People Say"
+
+Section 2 — Masonry Quote Grid (white background):
+- 6-8 testimonial cards in a masonry layout
+- Each card: quote text (2-3 sentences), person name, title, company, relationship context
+- Placeholder testimonials showing the structure
+- Mix of card sizes for visual interest
+
+Section 3 — Company Logos Strip:
+- Samsung, Huawei, EAI, Deraah logos as styled text badges
+
+Section 4 — Certification Badges:
+- Microsoft PL-300 badge
+- DataCamp badges placeholder
+
+===================================
+PAGE 8: RESOURCES
+===================================
+
+Purpose: Lead magnet hub. Primary email list builder.
+
+Section 1 — Hero (60vh, dark navy):
+- Headline: "Free Resources"
+- Subheadline: "Frameworks, templates, and checklists from real projects."
+
+Section 2 — Resource Cards Grid (3 columns):
+5 resource cards, each with:
+- Visual thumbnail placeholder
+- Title
+- Description (1-2 sentences)
+- Format badge (PDF / PPTX)
+- "Download Free" button (gold)
+
+Resources:
+1. "The Modern Data Platform Blueprint" (PDF) — Comprehensive guide to designing a modern analytics platform.
+2. "BI Transformation Checklist" (PDF) — Step-by-step audit checklist for BI maturity assessment.
+3. "DAX Patterns Cheat Sheet" (PDF) — Top 10 production DAX patterns with real examples.
+4. "Dashboard Design Template" (PPTX) — 1-page dashboard wireframe with labeled zones.
+5. "Data Governance 10-Pillar Framework" (PDF) — SDAIA/PDPL-aligned governance framework.
+
+Section 3 — Download Modal:
+- When "Download Free" is clicked, show a modal with: Name input, Email input, "Download Now" button
+- After submission: show thank-you message with link to download and recommended blog posts
+
+===================================
+PAGE 9: MEDIA & SPEAKING
+===================================
+
+Purpose: Position for speaking engagements and media opportunities.
+
+Section 1 — Hero (60vh, dark navy):
+- Headline: "Speaking & Media"
+- Subheadline: "Available for conferences, podcasts, and panels."
+
+Section 2 — Speaker Bio (white background):
+- 150-word professional bio in third person
+- Professional headshot
+- "Download Media Kit" button (gold)
+
+Section 3 — Speaking Topics (soft slate background):
+4 topic cards:
+1. "From 6 Tables to a Lakehouse: A Retail BI Transformation Story"
+2. "Building Analytics Teams from Scratch in the Middle East"
+3. "Dual-Calendar Analytics: The Unique Challenge of Saudi Retail"
+4. "The $80K Nobody Expected: ROI of Analytics Automation"
+
+Section 4 — Past Appearances:
+- Placeholder section: "Coming soon" styled elegantly (this section will be populated later)
+
+Section 5 — Speaker Inquiry Form:
+- Fields: Event Name, Event Date, Topic (dropdown of the 4 topics), Audience Size, Message
+- Gold submit button: "Submit Inquiry"
+
+===================================
+PAGE 10: CONTACT
+===================================
+
+Purpose: Make it effortless to reach out via multiple pathways.
+
+Section 1 — Hero (60vh, dark navy):
+- Headline: "Let's Talk"
+- Subheadline: "What data bottleneck are you trying to solve?"
+
+Section 2 — Contact Pathways (4 cards in a row on desktop):
+- Card 1: "Hire Me" icon + "Looking to bring a data platform architect onto your team?" + "Get in Touch" button
+- Card 2: "Data Consultation" icon + "Need help modernizing your analytics infrastructure?" + "Book a Free Audit" button
+- Card 3: "Speaking Request" icon + "Want me to speak at your event?" + "Submit Inquiry" button (links to Media page)
+- Card 4: "Just Say Hello" icon + "Want to connect or collaborate?" + "Send Message" button
+
+Section 3 — Contact Form (white background):
+- Fields: Name, Email, Subject (dropdown: Hiring, Consultation, Speaking, General), Message
+- Gold submit button: "Send Message"
+
+Section 4 — Calendar Embed Placeholder:
+- Section for Calendly embed: "Book a 30-Minute Discovery Call"
+- Placeholder box styled to indicate where Calendly widget will be embedded
+
+Section 5 — Contact Info:
+- Email: displayed as text (not hidden behind form)
+- LinkedIn: link with icon
+- GitHub: link with icon
+- Location: Riyadh, Saudi Arabia with subtle map pin icon
+
+===================================
+SEO & METADATA
+===================================
+
+For every page, generate proper:
+- Page title format: "[Page Name] | Hamed Elbhrawy — Data Platform Architect"
+- Meta descriptions (150-160 characters) with primary keywords
+- Single H1 per page
+- Semantic HTML structure: <header>, <main>, <section>, <article>, <footer>
+- Open Graph tags for LinkedIn/Twitter sharing previews
+- Image alt text on all visuals
+
+Target Keywords to naturally integrate:
+- "Data Platform Architect Riyadh"
+- "BI Architect Saudi Arabia"
+- "Power BI consultant"
+- "Medallion architecture"
+- "ClickHouse migration"
+- "Modern data stack"
+- "Analytics engineering"
+- "Data warehouse consultant"
+
+===================================
+CONVERSION ELEMENTS (SITE-WIDE)
+===================================
+
+- "Book a Call" gold button persists in navigation on every page
+- CV download available on Homepage, About, and Portfolio pages
+- Newsletter signup ("The Data Signal") inline at end of every blog post and in the footer
+- Every case study ends with: "Facing a Similar Challenge? Let's Talk." + gold CTA button
+- Exit-intent popup placeholder with lead magnet offer
+- "Open to Opportunities" toggle badge on homepage (small, top-right of hero)
+- Consistent CTAs: gold buttons for primary actions, outlined buttons for secondary
+
+===================================
+RESPONSIVE DESIGN
+===================================
+
+- All grids collapse from multi-column to single-column on mobile
+- Navigation collapses to hamburger menu
+- Hero text sizes reduce proportionally on mobile
+- Card grids: 3-col desktop → 2-col tablet → 1-col mobile
+- Section padding reduces by 40-50% on mobile
+- Metric numbers reduce to 36-48px on mobile
+- Touch-friendly tap targets (min 44px)
+- Images and diagrams scale responsively
+
+===================================
+TECHNOLOGY NOTES
+===================================
+
+- Use React with Tailwind CSS
+- Use Framer Motion for animations
+- Use Lucide React for icons
+- Import Google Fonts: Plus Jakarta Sans, DM Sans, JetBrains Mono, IBM Plex Sans Arabic
+- Store email submissions in Supabase (built into Lovable)
+- Prepare integration points for: Calendly (embed), Google Analytics 4, Resend (newsletter)
+
+Build the complete website now. Start with the Homepage and ensure all pages are navigable. Make it production-ready, fully responsive, and visually stunning.
