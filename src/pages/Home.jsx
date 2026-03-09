@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import {
     ArrowRight, Download, Zap, DollarSign, Users, Code, Database,
     BarChart3, ChevronRight, ExternalLink, Clock, Tag
 } from 'lucide-react'
+import { useRef } from 'react'
 import TypedText from '../components/TypedText'
 import AnimatedCounter from '../components/AnimatedCounter'
 import TechMarquee from '../components/TechMarquee'
@@ -75,8 +76,18 @@ const blogPosts = [
 ]
 
 export default function Home() {
+    const { scrollY } = useScroll()
+    const heroY = useTransform(scrollY, [0, 500], [0, 150])
+    const heroOpacity = useTransform(scrollY, [0, 300], [1, 0])
+
     return (
-        <main>
+        <main className="relative">
+            {/* Global connecting thread */}
+            <motion.div
+                className="hidden lg:block absolute left-12 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-gold/20 to-transparent pointer-events-none z-0"
+                style={{ height: "100%" }}
+            />
+
             {/* ─── HERO ──────────────────────────────────────── */}
             <section className="relative min-h-screen flex items-center hero-gradient grid-pattern overflow-hidden">
                 {/* Decorative blobs */}
@@ -178,6 +189,7 @@ export default function Home() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.3, duration: 0.8 }}
+                            style={{ y: heroY, opacity: heroOpacity }}
                             className="flex-shrink-0 relative"
                         >
                             <div className="relative w-64 h-64 md:w-72 md:h-72 lg:w-80 lg:h-80">
@@ -226,8 +238,24 @@ export default function Home() {
                 </motion.div>
             </section>
 
+            {/* ─── THE PROBLEM (Narrative Hook) ───────────────── */}
+            <section className="section-dark border-y border-white/5 relative z-10">
+                <div className="container-content relative">
+                    <FadeUp className="max-w-4xl mx-auto text-center">
+                        <h2 className="font-jakarta font-bold text-3xl md:text-5xl text-white mb-6 leading-tight">
+                            Data is abundant.<br />
+                            <span className="text-gold">Clarity is rare.</span>
+                        </h2>
+                        <p className="font-dm text-lg md:text-xl text-slate-muted leading-relaxed">
+                            Most enterprises sit on millions of records locked in siloed ERPs, CRMs, and legacy systems.
+                            I architect the bridges that turn that raw, chaotic data into <span className="text-teal font-semibold">executive-ready insights</span>.
+                        </p>
+                    </FadeUp>
+                </div>
+            </section>
+
             {/* ─── METRICS BAR ──────────────────────────────── */}
-            <section className="bg-navy-light border-y border-white/10">
+            <section className="bg-navy-light border-b border-white/10 relative z-10">
                 <div className="container-content py-12">
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
                         {metrics.map((m, i) => (
@@ -266,72 +294,52 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* ─── TRANSFORMATION STORY ─────────────────────── */}
-            <section className="section-slate">
+            {/* ─── TRANSFORMATION STORY (Scroll-Linked) ─────────────────────── */}
+            <section className="section-slate relative z-10">
                 <div className="container-content">
-                    <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-                        <FadeUp>
-                            <div className="tag-teal inline-flex mb-4">Case Study</div>
-                            <h2 className="section-heading">
-                                From 6 Broken Tables to a 32-Model Production Lakehouse
-                            </h2>
-                            <p className="text-charcoal/80 font-dm text-lg leading-relaxed mb-6">
-                                When I joined Deraah Retail Group, the analytics infrastructure was 6 legacy tables,
-                                dozens of disconnected Excel files, and dashboards that took 45 minutes to load.
-                            </p>
-                            <p className="text-charcoal/80 font-dm leading-relaxed mb-8">
-                                Today, it's a 32-model Medallion Lakehouse on ClickHouse, orchestrated by Apache Airflow,
-                                with dashboards loading in seconds — serving 1,200+ stores across Saudi Arabia.
-                            </p>
-                            <Link to="/case-studies" className="btn-outline-gold text-sm">
-                                Read the Full Case Study <ChevronRight size={16} />
-                            </Link>
-                        </FadeUp>
+                    <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+                        <div className="sticky top-32">
+                            <FadeUp>
+                                <div className="tag-teal inline-flex mb-4">The Solution</div>
+                                <h2 className="section-heading">
+                                    From 6 Broken Tables to a 32-Model Production Lakehouse
+                                </h2>
+                                <p className="text-slate-muted mb-6 text-lg font-dm">
+                                    A recent enterprise client was struggling with reporting delays and data trust issues. I completely re-architected their foundation.
+                                </p>
 
-                        {/* Visual: Before/After */}
-                        <FadeUp delay={0.2}>
-                            <div className="bg-navy rounded-2xl p-6 text-center overflow-hidden relative">
-                                <div className="grid grid-cols-2 gap-4 mb-4">
-                                    {/* Before */}
-                                    <div className="bg-red-950/40 border border-red-500/20 rounded-xl p-4">
-                                        <p className="font-mono text-red-400 text-xs uppercase tracking-wide mb-3">Before</p>
-                                        {['Table_1_final.xlsx', 'report_v3_FINAL.pbix', '?? Missing joins', 'ETL: 45 min', '6 sources', 'Manual only'].map((item, i) => (
-                                            <div key={i} className="flex items-center gap-2 mb-1.5">
-                                                <div className="w-1 h-1 rounded-full bg-red-500/60" />
-                                                <span className="text-red-300/70 text-xs font-mono">{item}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    {/* After */}
-                                    <div className="bg-teal/5 border border-teal/20 rounded-xl p-4">
-                                        <p className="font-mono text-teal text-xs uppercase tracking-wide mb-3">After</p>
-                                        {['Medallion Lakehouse', '32 dbt models', 'ClickHouse OLAP', 'ETL: &lt;2 min', '259x faster', '$80K saved'].map((item, i) => (
-                                            <div key={i} className="flex items-center gap-2 mb-1.5">
-                                                <div className="w-1 h-1 rounded-full bg-teal" />
-                                                <span dangerouslySetInnerHTML={{ __html: item }} className="text-teal/80 text-xs font-mono" />
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                                {/* Arrow */}
-                                <div className="flex items-center justify-center gap-2 mt-2">
-                                    <div className="h-px flex-1 bg-gradient-to-r from-red-500/30 to-gold/50" />
-                                    <ArrowRight className="text-gold" size={18} />
-                                    <div className="h-px flex-1 bg-gradient-to-r from-gold/50 to-teal/30" />
-                                </div>
-                            </div>
-                        </FadeUp>
+                                <ul className="space-y-4 mb-8">
+                                    {['Orchestrated via Apache Airflow', 'Transformed using dbt (Data Build Tool)', 'Visualize real-time in Power BI'].map((item, i) => (
+                                        <li key={i} className="flex items-center gap-3 text-charcoal font-dm">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-teal" />
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                <MagneticButton>
+                                    <Link to="/portfolio" className="btn-primary">
+                                        View Full Case Study <ArrowRight size={18} />
+                                    </Link>
+                                </MagneticButton>
+                            </FadeUp>
+                        </div>
+
+                        {/* Scroll-Linked Animation Container */}
+                        <div className="relative h-[150vh]">
+                            <TransformationVisualizer />
+                        </div>
                     </div>
                 </div>
             </section>
 
             {/* ─── FEATURED PROJECTS ────────────────────────── */}
-            <section className="section-light">
+            <section className="section-light relative z-10">
                 <div className="container-content">
                     <FadeUp className="flex items-end justify-between mb-10">
                         <div>
-                            <p className="text-slate-muted font-mono text-xs uppercase tracking-widest mb-2">Portfolio</p>
-                            <h2 className="section-heading mb-0">Selected Work</h2>
+                            <p className="text-slate-muted font-mono text-xs uppercase tracking-widest mb-2">The Execution</p>
+                            <h2 className="section-heading mb-0">Architectures I've Built</h2>
                         </div>
                         <Link to="/portfolio" className="hidden md:flex items-center gap-2 text-gold text-sm font-jakarta font-semibold hover:gap-3 transition-all">
                             View All Projects <ArrowRight size={14} />
@@ -369,15 +377,15 @@ export default function Home() {
             </section>
 
             {/* ─── LATEST INSIGHTS ──────────────────────────── */}
-            <section className="section-slate">
+            <section className="section-slate relative z-10">
                 <div className="container-content">
                     <FadeUp className="flex items-end justify-between mb-10">
                         <div>
-                            <p className="text-slate-muted font-mono text-xs uppercase tracking-widest mb-2">Thought Leadership</p>
-                            <h2 className="section-heading mb-0">Latest Insights</h2>
+                            <p className="text-slate-muted font-mono text-xs uppercase tracking-widest mb-2">The Methodology</p>
+                            <h2 className="section-heading mb-0">How I Think About Data</h2>
                         </div>
                         <Link to="/blog" className="hidden md:flex items-center gap-2 text-gold text-sm font-jakarta font-semibold hover:gap-3 transition-all">
-                            View All Posts <ArrowRight size={14} />
+                            Read More <ArrowRight size={14} />
                         </Link>
                     </FadeUp>
 
@@ -426,5 +434,78 @@ export default function Home() {
                 </div>
             </section>
         </main>
+    )
+}
+
+// Extract Transformation Visualizer into a separate component for cleaner scrolling logic
+function TransformationVisualizer() {
+    const containerRef = useRef(null)
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start center", "end center"]
+    })
+
+    // Before state fades out as user scrolls
+    const beforeOpacity = useTransform(scrollYProgress, [0.2, 0.5], [1, 0])
+    const beforeY = useTransform(scrollYProgress, [0.2, 0.5], [0, -50])
+
+    // After state fades in as user scrolls
+    const afterOpacity = useTransform(scrollYProgress, [0.4, 0.7], [0, 1])
+    const afterY = useTransform(scrollYProgress, [0.4, 0.7], [50, 0])
+
+    return (
+        <div ref={containerRef} className="absolute inset-0">
+            <div className="sticky top-1/3 w-full">
+                <div className="relative bg-white border border-slate-100 rounded-2xl p-8 shadow-2xl overflow-hidden min-h-[300px]">
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-white z-0" />
+
+                    {/* BEFORE STATE */}
+                    <motion.div
+                        style={{ opacity: beforeOpacity, y: beforeY }}
+                        className="absolute inset-0 p-8 flex flex-col justify-center z-10 bg-red-50/50 backdrop-blur-sm"
+                    >
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="font-mono text-sm font-bold text-red-500 uppercase tracking-widest flex items-center gap-2">
+                                <span className="relative flex h-3 w-3">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                </span>
+                                Before
+                            </span>
+                            <Clock size={24} className="text-red-400 opacity-50" />
+                        </div>
+                        <h3 className="text-2xl font-jakarta font-bold text-slate-800 mb-2">Chaos & Latency</h3>
+                        <p className="text-red-900/80 font-dm font-medium text-lg border-l-4 border-red-500 pl-4 py-2 bg-white/50 rounded-r-lg">
+                            Nightly batch loads taking 8+ hours. Constant pipeline failures. Siloed data sources causing misaligned executive reports.
+                        </p>
+                    </motion.div>
+
+                    {/* AFTER STATE */}
+                    <motion.div
+                        style={{ opacity: afterOpacity, y: afterY }}
+                        className="absolute inset-0 p-8 flex flex-col justify-center z-20 bg-teal/5 backdrop-blur-sm shadow-[inset_0_0_100px_rgba(26,188,156,0.1)]"
+                    >
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="font-mono text-sm font-bold text-teal uppercase tracking-widest flex items-center gap-2">
+                                <Zap size={18} />
+                                After
+                            </span>
+                            <Database size={24} className="text-teal opacity-50" />
+                        </div>
+                        <h3 className="text-2xl font-jakarta font-bold text-navy mb-2">The Modern Lakehouse</h3>
+                        <div className="space-y-4">
+                            <p className="text-teal-dark font-dm font-medium text-lg border-l-4 border-teal pl-4 py-2 bg-white/80 rounded-r-lg shadow-sm">
+                                Near real-time streaming architecture. 99.9% pipeline reliability.
+                            </p>
+                            <div className="flex gap-2 text-xs font-mono font-bold text-slate-500">
+                                <span className="bg-white px-3 py-1.5 rounded-full border border-slate-200">#dbt</span>
+                                <span className="bg-white px-3 py-1.5 rounded-full border border-slate-200">#Snowflake</span>
+                                <span className="bg-white px-3 py-1.5 rounded-full border border-slate-200">#Airflow</span>
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+            </div>
+        </div>
     )
 }
