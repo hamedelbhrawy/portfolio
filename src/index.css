@@ -140,6 +140,15 @@
   margin-bottom: 24px;
 }
 
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Page transition */
 .page-enter {
   opacity: 0;

@@ -24,14 +24,44 @@ const pageVariants = {
     exit: { opacity: 0, y: -10, transition: { duration: 0.2 } },
 }
 
+function MainLayout() {
+    return (
+        <div className="relative">
+            <section id="home"><Home /></section>
+            <section id="about"><About /></section>
+            <section id="services"><Services /></section>
+            <section id="portfolio"><Portfolio /></section>
+            <section id="contact"><Contact /></section>
+        </div>
+    )
+}
+
 function AnimatedRoutes() {
     const location = useLocation()
     const { i18n } = useTranslation()
 
     useEffect(() => {
-        // Scroll to top on route change
-        window.scrollTo(0, 0);
-    }, [location.pathname]);
+        // If it's a hash link, scroll to it, otherwise scroll to top
+        if (location.hash) {
+            const id = location.hash.replace('#', '')
+            const element = document.getElementById(id)
+            if (element) {
+                const navHeight = 80; // Approximate height of fixed navbar
+                const elementPosition = element.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - navHeight;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                })
+            }
+        } else if (location.pathname === '/') {
+            // Keep home scroll position if just navigating to root, 
+            // but usually we want to start at the top if it's a fresh visit
+        } else {
+            window.scrollTo(0, 0);
+        }
+    }, [location]);
 
     useEffect(() => {
         // Set text direction based on language
@@ -41,27 +71,48 @@ function AnimatedRoutes() {
 
     return (
         <AnimatePresence mode="wait">
-            <motion.div
-                key={location.pathname}
-                variants={pageVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-            >
-                <Routes location={location}>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/services" element={<Services />} />
-                    <Route path="/portfolio" element={<Portfolio />} />
-                    <Route path="/case-studies" element={<CaseStudies />} />
-                    <Route path="/blog" element={<Blog />} />
-                    <Route path="/blog/:slug" element={<BlogPost />} />
-                    <Route path="/testimonials" element={<Testimonials />} />
-                    <Route path="/resources" element={<Resources />} />
-                    <Route path="/media" element={<Media />} />
-                    <Route path="/contact" element={<Contact />} />
-                </Routes>
-            </motion.div>
+            <Routes location={location} key={location.pathname}>
+                <Route path="/" element={
+                    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                        <MainLayout />
+                    </motion.div>
+                } />
+                <Route path="/about" element={<MainLayout />} />
+                <Route path="/services" element={<MainLayout />} />
+                <Route path="/portfolio" element={<MainLayout />} />
+                <Route path="/contact" element={<MainLayout />} />
+
+                <Route path="/case-studies" element={
+                    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                        <CaseStudies />
+                    </motion.div>
+                } />
+                <Route path="/blog" element={
+                    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                        <Blog />
+                    </motion.div>
+                } />
+                <Route path="/blog/:slug" element={
+                    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                        <BlogPost />
+                    </motion.div>
+                } />
+                <Route path="/testimonials" element={
+                    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                        <Testimonials />
+                    </motion.div>
+                } />
+                <Route path="/resources" element={
+                    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                        <Resources />
+                    </motion.div>
+                } />
+                <Route path="/media" element={
+                    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                        <Media />
+                    </motion.div>
+                } />
+            </Routes>
         </AnimatePresence>
     )
 }
@@ -72,7 +123,7 @@ function App() {
             <div className="min-h-screen flex flex-col flex-1 overflow-x-hidden relative">
                 <MouseSpotlight />
                 <Navbar />
-                <div className="flex-1 pt-16 md:pt-18 z-10 relative">
+                <div className="flex-1 pt-16 md:pt-20 z-10 relative">
                     <AnimatedRoutes />
                 </div>
                 <Footer />

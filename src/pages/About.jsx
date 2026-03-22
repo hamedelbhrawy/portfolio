@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { Download, ExternalLink, Award, BookOpen, ChevronDown, Database, RefreshCw, Server, Settings, Network, Activity, LineChart } from 'lucide-react'
-import { useState } from 'react'
+import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion'
+import { Download, ExternalLink, Award, BookOpen, ChevronDown, Database, RefreshCw, Server, Settings, Network, Activity, LineChart, Cpu, Zap, Target, ArrowDown } from 'lucide-react'
+import { useState, useRef } from 'react'
 import PageHero from '../components/PageHero'
 import FadeUp from '../components/FadeUp'
 
@@ -11,28 +11,36 @@ const timeline = [
         company: 'Samsung Electronics',
         role: 'Promoter → Team Leader → Data Analyst',
         achievement: 'Built foundation in sales operations. Taught myself SQL at night to make sense of the data.',
-        color: 'bg-blue-electric',
+        color: 'from-blue-600 to-blue-400',
+        glow: 'shadow-blue-500/20',
+        icon: Target
     },
     {
         period: '2022',
         company: 'Huawei Technologies',
         role: 'Regional Data Analyst',
         achievement: '15+ automated reports built in 30 days for the Delta region.',
-        color: 'bg-teal',
+        color: 'from-red-600 to-red-400',
+        glow: 'shadow-red-500/20',
+        icon: Zap
     },
     {
         period: '2022 – 2023',
         company: 'EAI Company',
         role: 'Operations Analyst & BI Developer',
         achievement: '10 major BI systems in 12 months: supply chain, ERP master data, and more.',
-        color: 'bg-gold',
+        color: 'from-gold to-yellow-500',
+        glow: 'shadow-gold/20',
+        icon: Settings
     },
     {
         period: '2023 – Present',
         company: 'Deraah Retail Group',
         role: 'Head of Analytics & BI Architect',
         achievement: '6 tables → 32-model production Medallion Lakehouse. Leading a 6-person analytics team.',
-        color: 'bg-teal',
+        color: 'from-teal to-emerald-400',
+        glow: 'shadow-teal/20',
+        icon: Cpu,
         current: true,
     },
 ]
@@ -70,238 +78,256 @@ const datacampCourses = [
     'ETL and ELT in Python', 'Reporting in SQL',
 ]
 
-export default function About() {
-    const [showCourses, setShowCourses] = useState(false)
+const ScrolledText = ({ text, progress, highlightWords = [] }) => {
+    const words = text.split(' ')
+    return (
+        <span className="inline-flex flex-wrap gap-x-[0.3em] gap-y-1">
+            {words.map((word, i) => {
+                const start = (i / words.length) * 0.8
+                const end = start + 0.2
+                const opacity = useTransform(progress, [start, end], [0.15, 1])
+                const scale = useTransform(progress, [start, end], [0.98, 1])
+                const clean = word.replace(/[.,!?]/g, '')
+                const isHL = highlightWords.includes(clean)
+                const color = useTransform(progress, [start, end], ["#e2e8f0", isHL ? "#C5A55A" : "#1e293b"])
+                
+                return (
+                    <motion.span key={i} style={{ opacity, scale, color }} className="transition-none">
+                        {word}
+                    </motion.span>
+                )
+            })}
+        </span>
+    )
+}
+
+function PhilosophyItem({ item, index }) {
+    const ref = useRef(null)
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ["start center", "end center"]
+    })
+    const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.9, 1, 0.9])
+    const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.3, 1, 1, 0.3])
+    const x = useTransform(scrollYProgress, [0, 0.5, 1], [20, 0, -20])
 
     return (
-        <main>
+        <motion.div ref={ref} style={{ scale, opacity, x }} className="flex gap-8 group">
+            <div className="flex-shrink-0 w-20 h-20 rounded-3xl bg-slate-50 flex items-center justify-center font-mono font-black text-3xl text-gold group-hover:bg-gold group-hover:text-white transition-all duration-700 shadow-lg border border-slate-100">
+                {item.number}
+            </div>
+            <div className="pt-2">
+                <h3 className="font-jakarta font-black text-navy p-2 px-4 inline-block rounded-lg text-2xl mb-4 group-hover:text-gold transition-colors">{item.title}</h3>
+                <p className="text-charcoal/80 font-dm text-lg leading-relaxed">{item.body}</p>
+            </div>
+        </motion.div>
+    )
+}
+
+function TimelineItem({ item, index }) {
+    const itemRef = useRef(null)
+    const { scrollYProgress } = useScroll({
+        target: itemRef,
+        offset: ["start 80%", "center center"]
+    })
+
+    const opacity = useTransform(scrollYProgress, [0, 0.5], [0.2, 1])
+    const scale = useTransform(scrollYProgress, [0, 0.5], [0.9, 1])
+    const x = useTransform(scrollYProgress, [0, 0.5], [-30, 0])
+
+    return (
+        <motion.div
+            ref={itemRef}
+            style={{ opacity, scale, x }}
+            className="relative pl-12 md:pl-20 pb-20 last:pb-0"
+        >
+            {/* Connection Dot */}
+            <div className={`absolute left-0 top-0 w-10 h-10 -translate-x-1/2 rounded-full border-4 border-slate-50 flex items-center justify-center bg-gradient-to-br ${item.color} shadow-2xl ${item.glow} z-10 overflow-hidden group`}>
+                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <item.icon className="text-white relative z-10" size={18} />
+            </div>
+
+            <div className="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100 hover:border-gold/30 transition-all group relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="flex items-center gap-4 mb-4">
+                    <span className="font-mono text-sm font-black text-gold bg-gold/5 px-4 py-1.5 rounded-full border border-gold/10 tracking-widest">{item.period}</span>
+                    {item.current && <span className="tag-teal text-[10px] animate-pulse">Active Role</span>}
+                </div>
+                <h3 className="font-jakarta font-black text-navy text-2xl md:text-3xl mb-2 group-hover:text-gold transition-colors tracking-tight">{item.company}</h3>
+                <p className="text-charcoal/40 font-mono text-sm mb-6 uppercase tracking-widest font-bold">{item.role}</p>
+                <div className="h-[2px] w-16 bg-gold/20 mb-6 group-hover:w-full transition-all duration-1000" />
+                <p className="text-charcoal/70 font-dm text-lg leading-relaxed italic">
+                    {item.achievement}
+                </p>
+            </div>
+        </motion.div>
+    )
+}
+
+export default function About() {
+    const [showCourses, setShowCourses] = useState(false)
+    const originRef = useRef(null)
+    const { scrollYProgress: originProgress } = useScroll({
+        target: originRef,
+        offset: ["start center", "45% center"]
+    })
+    const { scrollYProgress: originProgress2 } = useScroll({
+        target: originRef,
+        offset: ["45% center", "end center"]
+    })
+
+    const timelineContainerRef = useRef(null)
+    const { scrollYProgress: pathProgress } = useScroll({
+        target: timelineContainerRef,
+        offset: ["start 80%", "end 80%"]
+    })
+    const pathHeight = useSpring(useTransform(pathProgress, [0, 1], ["0%", "100%"]), { stiffness: 100, damping: 30 })
+
+    const philosophyRef = useRef(null)
+    const { scrollYProgress: philProgress } = useScroll({
+        target: philosophyRef,
+        offset: ["start end", "center center"]
+    })
+
+    return (
+        <main className="overflow-x-hidden bg-white text-navy selection:bg-gold selection:text-navy">
             <PageHero
                 title="The Story Behind the Data"
                 subtitle="From Samsung phone promoter to enterprise data platform architect — a career built on curiosity, not credentials."
             />
 
-            {/* ─── ORIGIN STORY ─────────────────────────────── */}
-            <section className="section-light">
-                <div className="container-content">
-                    <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
-                        <FadeUp>
-                            <h2 className="section-heading mb-6">The Unexpected Path</h2>
-                            <div className="space-y-5 font-dm text-charcoal/80 text-lg leading-relaxed">
-                                <p>
-                                    I studied accounting at Zagazig University and graduated into a job as a Samsung phone promoter.
-                                    Not exactly a typical data career origin story. But every evening after my shift, I'd go home and
-                                    teach myself SQL — not because anyone told me to, but because I was obsessed with understanding
-                                    <em> why</em> the sales numbers looked the way they did.
-                                </p>
-                                <p>
-                                    My first dashboard was terrible. Wrong aggregations, no clear hierarchy, colors that made everyone's
-                                    eyes hurt. But I shipped it, got feedback, and rebuilt it. That iterative obsession took me from
-                                    promoter to analyst, then through Huawei and EAI — building reporting systems, automating pipelines,
-                                    and eventually owning entire BI functions.
-                                </p>
-                                <p>
-                                    Today at Deraah Retail Group, I lead a 6-person analytics team and have architected the company's
-                                    entire modern data platform from scratch — a Medallion Lakehouse serving 1,200+ stores across Saudi Arabia
-                                    in real time. The accounting background turned out to be a superpower: I understand the business
-                                    logic behind every metric, not just the technical pipeline.
-                                </p>
-                            </div>
-                        </FadeUp>
-
-                        <FadeUp delay={0.2}>
-                            {/* Headshot + floating cards */}
-                            <div className="relative">
-                                <div className="w-full aspect-square rounded-2xl overflow-hidden bg-navy-light flex items-center justify-center">
-                                    <img
-                                        src="/headshot.jpg"
-                                        alt="Hamed Elbhrawy"
-                                        className="w-full h-full object-cover object-center"
-                                        onError={(e) => {
-                                            e.target.style.display = 'none'
-                                            e.target.parentElement.innerHTML = '<div class="text-center"><div class="font-jakarta font-bold text-8xl text-gold">H</div><p class="font-mono text-slate-muted text-sm mt-2">Hamed Elbhrawy</p></div>'
-                                        }}
+            {/* ─── ORIGIN STORY: CINEMATIC SCRUB ─────────────── */}
+            <section ref={originRef} className="relative h-[150vh]">
+                <div className="sticky top-16 md:top-20 h-screen flex flex-col items-center justify-start pt-32 pb-16 bg-white/80 backdrop-blur-sm">
+                    <div className="container-content">
+                        <div className="max-w-4xl mx-auto space-y-12">
+                            <FadeUp>
+                                <span className="font-mono text-xs text-gold uppercase tracking-[0.4em] mb-4 block font-bold">The Narrative</span>
+                                <h2 className="text-5xl md:text-7xl font-jakarta font-black tracking-tighter leading-[0.9] mb-8">The Unexpected <br />Path</h2>
+                            </FadeUp>
+                            
+                            <div className="space-y-12 font-jakarta text-2xl md:text-4xl font-black leading-tight tracking-tighter">
+                                <p className="relative">
+                                    <ScrolledText 
+                                        progress={originProgress}
+                                        text="I studied accounting and graduated into a job as a Samsung phone promoter. Not a typical data story. But every evening, I taught myself SQL—obsessed with why the sales numbers looked the way they did."
+                                        highlightWords={['SQL', 'obsessed']}
                                     />
-                                </div>
-                                {/* Floating stat */}
-                                <div className="absolute -bottom-4 -left-4 bg-white border border-slate-200 rounded-xl shadow-xl p-4">
-                                    <p className="font-mono font-bold text-gold text-2xl">259x</p>
-                                    <p className="text-charcoal text-xs font-dm">Faster Dashboards</p>
-                                </div>
-                                <div className="absolute -top-4 -right-4 bg-navy rounded-xl border border-gold/30 shadow-xl p-4">
-                                    <p className="font-mono font-bold text-teal text-2xl">6+</p>
-                                    <p className="text-slate-muted text-xs font-dm">Years Building</p>
-                                </div>
+                                </p>
+                                <p>
+                                    <ScrolledText 
+                                        progress={originProgress2}
+                                        text="That iterative obsession took me through Huawei and EAI, building systems and automating pipelines, eventually owning entire BI functions."
+                                        highlightWords={['Huawei', 'EAI', 'pipelines']}
+                                    />
+                                </p>
+                                <motion.div 
+                                    style={{ opacity: useTransform(originProgress2, [0.8, 1], [0, 1]), y: useTransform(originProgress2, [0.8, 1], [20, 0]) }}
+                                    className="p-8 bg-navy text-white rounded-[2.5rem] border-l-8 border-gold shadow-2xl text-xl font-dm font-normal tracking-normal leading-relaxed relative overflow-hidden"
+                                >
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-gold/10 blur-3xl rounded-full" />
+                                    Today at Deraah Retail Group, I lead a 6-person analytics team and have architected the company's entire modern data platform from scratch.
+                                </motion.div>
                             </div>
-                        </FadeUp>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* ─── CAREER TIMELINE ──────────────────────────── */}
-            <section className="section-slate">
+            {/* ─── CAREER TIMELINE: DRAWING PATH ────────────── */}
+            <section className="bg-slate-50 py-40">
                 <div className="container-content">
-                    <FadeUp className="text-center mb-14">
-                        <p className="text-slate-muted font-mono text-xs uppercase tracking-widest mb-2">Career Path</p>
-                        <h2 className="section-heading">The Journey</h2>
+                    <FadeUp className="text-center mb-32">
+                        <p className="text-gold font-mono text-xs uppercase tracking-[0.4em] mb-4">Evolution</p>
+                        <h2 className="text-5xl md:text-8xl font-jakarta font-black tracking-tighter leading-none mb-6">Career Timeline</h2>
+                        <div className="w-24 h-1 bg-gold mx-auto rounded-full" />
                     </FadeUp>
 
-                    <div className="relative max-w-2xl mx-auto">
-                        {/* Vertical line */}
-                        <div className="absolute left-5 top-0 bottom-0 w-px bg-gradient-to-b from-gold via-teal to-blue-electric/50" />
+                    <div className="max-w-4xl mx-auto relative pt-12" ref={timelineContainerRef}>
+                        {/* The Animated Career Line */}
+                        <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-slate-200 rounded-full" />
+                        <motion.div 
+                            style={{ height: pathHeight }}
+                            className="absolute left-0 top-0 w-[2px] bg-gradient-to-b from-blue-500 via-gold to-teal z-0 rounded-full origin-top shadow-[0_0_15px_#C5A55A]"
+                        />
 
-                        <div className="space-y-10 pl-14">
+                        <div className="relative z-10">
                             {timeline.map((item, i) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
-                                    viewport={{ once: true, margin: '-50px' }}
-                                    transition={{ delay: i * 0.15, duration: 0.6 }}
-                                    className="relative"
-                                >
-                                    {/* Dot */}
-                                    <div className={`absolute -left-9 top-1.5 w-4 h-4 rounded-full border-2 border-white shadow-md ${item.color} ${item.current ? 'ring-2 ring-offset-2 ring-teal/50' : ''}`} />
-
-                                    <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
-                                        <div className="flex items-start justify-between flex-wrap gap-2 mb-2">
-                                            <div>
-                                                <span className="font-mono text-xs text-slate-muted">{item.period}</span>
-                                                {item.current && (
-                                                    <span className="ml-2 tag-teal text-xs">Current</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <h3 className="font-jakarta font-bold text-navy text-lg mb-0.5">{item.company}</h3>
-                                        <p className="text-charcoal/70 font-mono text-sm mb-3">{item.role}</p>
-                                        <p className="text-charcoal/80 font-dm text-sm leading-relaxed">
-                                            ✦ {item.achievement}
-                                        </p>
-                                    </div>
-                                </motion.div>
+                                <TimelineItem key={i} item={item} />
                             ))}
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* ─── PHILOSOPHY ───────────────────────────────── */}
-            <section className="section-light">
-                <div className="container-content">
-                    <FadeUp className="text-center mb-12">
-                        <p className="text-slate-muted font-mono text-xs uppercase tracking-widest mb-2">Approach</p>
-                        <h2 className="section-heading">How I Think About Data</h2>
-                    </FadeUp>
-
-                    <div className="grid md:grid-cols-3 gap-6">
-                        {philosophy.map((p, i) => (
-                            <FadeUp key={i} delay={i * 0.1}>
-                                <div className="card h-full">
-                                    <div className="font-mono font-bold text-4xl text-gold/20 mb-4">{p.number}</div>
-                                    <h3 className="font-jakarta font-bold text-navy text-lg mb-3">{p.title}</h3>
-                                    <p className="text-charcoal/80 font-dm text-sm leading-relaxed">{p.body}</p>
+            {/* ─── PHILOSOPHY: SCROLL SNAP ──────────────────── */}
+            <section className="py-40 bg-white relative" ref={philosophyRef}>
+                <div className="container-content relative z-10">
+                    <div className="grid lg:grid-cols-2 gap-32 items-start">
+                        <div className="sticky top-32">
+                            <span className="text-gold font-mono text-xs uppercase tracking-[0.4em] mb-6 block font-bold">The Creed</span>
+                            <h2 className="text-5xl md:text-7xl font-jakarta font-black tracking-tighter leading-[0.9] mb-12">How I Architect Solutions</h2>
+                            <p className="text-charcoal/60 text-xl leading-relaxed font-dm max-w-lg mb-12">
+                                Data engineering isn't just about moving bits. It's about constructing a reliable window into the business heart.
+                            </p>
+                            
+                            <div className="space-y-4">
+                                <p className="font-mono text-[10px] uppercase tracking-widest text-slate-400">Architecture Progress</p>
+                                <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                                    <motion.div 
+                                        style={{ scaleX: philProgress, transformOrigin: 'left' }}
+                                        className="h-full w-full bg-gold shadow-[0_0_10px_#C5A55A]"
+                                    />
                                 </div>
-                            </FadeUp>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* ─── ARCHITECTURE DIAGRAM ─────────────────────── */}
-            <section className="section-slate">
-                <div className="container-content">
-                    <FadeUp className="text-center mb-10">
-                        <p className="text-slate-muted font-mono text-xs uppercase tracking-widest mb-2">Architecture</p>
-                        <h2 className="section-heading">The Platform I Build</h2>
-                    </FadeUp>
-
-                    <FadeUp delay={0.2}>
-                        <div className="bg-navy rounded-2xl p-8 md:p-12 border border-white/10 overflow-x-auto">
-                            <div className="flex items-center justify-between gap-2 md:gap-4 min-w-max mx-auto">
-                                {[
-                                    { label: 'Data Sources', sub: 'ERP / Salesforce\nD365 / APIs', icon: Database, color: 'border-blue-electric/40 text-blue-electric', animation: { y: [0, -4, 0] }, transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' } },
-                                    { label: 'Ingestion', sub: 'Airbyte\nELT Pipelines', icon: RefreshCw, color: 'border-teal/40 text-teal', animation: { rotate: 360 }, transition: { duration: 4, repeat: Infinity, ease: 'linear' } },
-                                    { label: 'Storage', sub: 'ClickHouse\nOLAP Engine', icon: Server, color: 'border-gold/40 text-gold', animation: { scale: [1, 1.05, 1] }, transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' } },
-                                    { label: 'Transform', sub: 'dbt\nMedallion', icon: Settings, color: 'border-teal/40 text-teal', animation: { rotate: -360 }, transition: { duration: 5, repeat: Infinity, ease: 'linear' } },
-                                    { label: 'Orchestrate', sub: 'Apache Airflow', icon: Network, color: 'border-blue-electric/40 text-blue-electric', animation: { opacity: [0.7, 1, 0.7] }, transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' } },
-                                    { label: 'Monitor', sub: 'Prometheus\nGrafana', icon: Activity, color: 'border-gold/40 text-gold', animation: { rotate: [0, -10, 10, -10, 10, 0] }, transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut', repeatDelay: 2 } },
-                                    { label: 'Visualize', sub: 'Power BI\n353 Measures', icon: LineChart, color: 'border-teal/40 text-teal', animation: { scale: [1, 1.1, 1] }, transition: { duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 1 } },
-                                ].map((node, i, arr) => (
-                                    <div key={i} className="flex items-center gap-2 md:gap-4 group">
-                                        <div className={`bg-navy border ${node.color} rounded-xl p-3 md:p-4 text-center w-24 md:w-28 relative overflow-hidden transition-colors hover:bg-navy-light`}>
-                                            <div className="absolute inset-0 bg-gradient-to-t from-current to-transparent opacity-5" />
-                                            <div className="text-xl mb-3 flex justify-center">
-                                                <motion.div animate={node.animation} transition={node.transition}>
-                                                    <node.icon size={28} strokeWidth={1.5} />
-                                                </motion.div>
-                                            </div>
-                                            <p className={`font-jakarta font-bold text-xs ${node.color.split(' ')[1]} relative z-10`}>{node.label}</p>
-                                            <p className="text-slate-muted text-xs font-mono mt-1 whitespace-pre-line leading-tight relative z-10">{node.sub}</p>
-                                        </div>
-                                        {i < arr.length - 1 && (
-                                            <div className="text-gold/40 font-mono text-lg flex-shrink-0">→</div>
-                                        )}
-                                    </div>
-                                ))}
                             </div>
                         </div>
-                    </FadeUp>
+
+                        <div className="space-y-40 py-20">
+                            {philosophy.map((p, i) => (
+                                <PhilosophyItem key={i} item={p} index={i} />
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            {/* ─── CERTIFICATIONS ───────────────────────────── */}
-            <section className="section-light">
+            {/* ─── CREDENTIALS ────────────────────────────── */}
+            <section className="py-40 bg-slate-50">
                 <div className="container-content">
-                    <FadeUp className="text-center mb-10">
-                        <p className="text-slate-muted font-mono text-xs uppercase tracking-widest mb-2">Credentials</p>
-                        <h2 className="section-heading">Certifications</h2>
+                    <FadeUp className="text-center mb-20">
+                        <p className="text-gold font-mono text-xs uppercase tracking-[0.4em] mb-4">Credentials</p>
+                        <h2 className="text-5xl md:text-7xl font-jakarta font-black tracking-tighter leading-none">Certifications & Learning</h2>
                     </FadeUp>
 
-                    <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-8">
+                    <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto mb-16">
                         {certifications.map((cert, i) => (
                             <FadeUp key={i} delay={i * 0.1}>
-                                <div className={`card flex items-center gap-4 ${cert.highlight ? 'border-gold/30 bg-gold/5' : ''}`}>
-                                    <div className="w-14 h-14 rounded-xl bg-navy flex items-center justify-center flex-shrink-0">
-                                        {cert.highlight ? <Award className="text-gold" size={24} /> : <BookOpen className="text-teal" size={24} />}
+                                <div className={`bg-white rounded-[2rem] p-8 border ${cert.highlight ? 'border-gold/30 shadow-xl' : 'border-slate-100 shadow-lg'} relative overflow-hidden group`}>
+                                    {cert.highlight && <div className="absolute top-0 right-0 w-24 h-24 bg-gold/10 blur-2xl rounded-full" />}
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${cert.highlight ? 'bg-gold/10 text-gold' : 'bg-slate-100 text-slate-400'}`}>
+                                            <Award size={24} />
+                                        </div>
+                                        <span className="font-mono text-xs font-bold text-slate-400 uppercase tracking-widest">{cert.code}</span>
                                     </div>
-                                    <div>
-                                        <h3 className="font-jakarta font-bold text-navy mb-0.5">{cert.name}</h3>
-                                        <p className="text-slate-muted text-xs font-mono">{cert.issuer}</p>
-                                        {cert.highlight && <span className="tag-gold mt-1.5 inline-flex">{cert.code}</span>}
-                                    </div>
+                                    <h3 className="font-jakarta font-black text-navy text-xl mb-2 group-hover:text-gold transition-colors">{cert.name}</h3>
+                                    <p className="text-charcoal/60 font-dm text-sm">{cert.issuer}</p>
                                 </div>
                             </FadeUp>
                         ))}
                     </div>
 
-                    {/* DataCamp accordion */}
-                    <FadeUp className="max-w-2xl mx-auto">
-                        <button
-                            onClick={() => setShowCourses(!showCourses)}
-                            className="w-full card flex items-center justify-between text-left hover:border-gold/30"
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                                    <span className="text-green-500 font-bold text-sm">DC</span>
-                                </div>
-                                <div>
-                                    <p className="font-jakarta font-semibold text-navy text-sm">DataCamp Certifications</p>
-                                    <p className="text-slate-muted text-xs font-mono">20+ courses completed</p>
-                                </div>
-                            </div>
-                            <ChevronDown className={`text-slate-muted transition-transform ${showCourses ? 'rotate-180' : ''}`} size={18} />
+                    <FadeUp className="text-center">
+                        <button onClick={() => setShowCourses(!showCourses)} className="inline-flex items-center gap-2 font-jakarta font-bold text-navy hover:text-gold transition-colors text-lg">
+                            <BookOpen size={20} />
+                            {showCourses ? 'Hide' : 'Show'} DataCamp Courses ({datacampCourses.length})
+                            <ChevronDown size={18} className={`transition-transform ${showCourses ? 'rotate-180' : ''}`} />
                         </button>
 
                         {showCourses && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                className="mt-2 card border-t-0 rounded-t-none grid grid-cols-2 gap-x-4 gap-y-2"
-                            >
+                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-8 flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
                                 {datacampCourses.map((course, i) => (
-                                    <div key={i} className="flex items-center gap-2">
-                                        <div className="w-1 h-1 rounded-full bg-teal flex-shrink-0" />
-                                        <span className="text-charcoal/80 text-xs font-dm">{course}</span>
-                                    </div>
+                                    <span key={i} className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-dm text-charcoal/80 shadow-sm">{course}</span>
                                 ))}
                             </motion.div>
                         )}
@@ -309,17 +335,68 @@ export default function About() {
                 </div>
             </section>
 
-            {/* ─── CTA ──────────────────────────────────────── */}
-            <section className="section-dark">
+            {/* ─── ARCHITECTURE ENGINE ──────────────────────── */}
+            <section className="py-40 bg-navy relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(196,160,82,0.1),transparent_70%)]" />
+                <div className="container-content relative z-10">
+                    <FadeUp className="text-center mb-32">
+                        <p className="text-gold font-mono text-xs uppercase tracking-[0.3em] mb-4">Engineering Moat</p>
+                        <h2 className="text-5xl md:text-8xl font-jakarta font-black text-white tracking-tighter leading-none">Full-Stack Engine</h2>
+                    </FadeUp>
+
+                    <div className="bg-white/[0.02] rounded-[3rem] p-12 md:p-20 border border-white/5 backdrop-blur-2xl shadow-3xl overflow-x-auto no-scrollbar">
+                        <div className="flex items-center justify-between gap-12 min-w-[1200px] mx-auto">
+                            {[
+                                { label: 'Sources', sub: 'ERP / CRM\nAPIs / CSV', icon: Database, color: 'text-blue-400' },
+                                { label: 'Ingest', sub: 'Airbyte\nFivetran', icon: RefreshCw, color: 'text-teal', spin: true },
+                                { label: 'Lakehouse', sub: 'ClickHouse\nBigQuery', icon: Server, color: 'text-gold', bounce: true },
+                                { label: 'Model', sub: 'dbt\nSQL', icon: Settings, color: 'text-teal', spinRev: true },
+                                { label: 'Insight', sub: 'Power BI\nGrafana', icon: LineChart, color: 'text-red-400', pulse: true },
+                            ].map((node, i, arr) => (
+                                <div key={i} className="flex items-center gap-12">
+                                    <div className="relative text-center w-40 group">
+                                        <div className="mb-8 flex justify-center">
+                                            <div className="w-24 h-24 rounded-[2rem] bg-navy border border-white/10 flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.5)] group-hover:border-gold/30 transition-all duration-500">
+                                                <motion.div 
+                                                    animate={
+                                                        node.spin ? { rotate: 360 } : 
+                                                        node.spinRev ? { rotate: -360 } : 
+                                                        node.bounce ? { y: [0, -8, 0] } :
+                                                        node.pulse ? { scale: [1, 1.15, 1] } : {}
+                                                    }
+                                                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                                                    className={node.color}
+                                                >
+                                                    <node.icon size={48} strokeWidth={1} />
+                                                </motion.div>
+                                            </div>
+                                        </div>
+                                        <p className="font-jakarta font-black text-xl text-white mb-2 leading-none">{node.label}</p>
+                                        <p className="font-mono text-[10px] uppercase text-slate-500 tracking-widest leading-relaxed whitespace-pre-line">{node.sub}</p>
+                                    </div>
+                                    {i < arr.length - 1 && (
+                                        <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent min-w-[50px]" />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── FINAL CALL ───────────────────────────────── */}
+            <section className="py-40 bg-white">
                 <div className="container-content text-center">
                     <FadeUp>
-                        <h2 className="section-heading-white mb-6">Ready to See the Work?</h2>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <a href="/cv-hamed-elbhrawy.pdf" className="btn-primary px-8 py-3.5" download>
-                                <Download size={16} /> Download Full CV
+                        <h2 className="text-6xl md:text-9xl font-jakarta font-black text-navy mb-12 tracking-tighter leading-[0.85]">
+                            See the <br /><span className="text-gold">Impact.</span>
+                        </h2>
+                        <div className="flex flex-col sm:flex-row gap-8 justify-center items-center mt-20">
+                            <a href="/cv-hamed-elbhrawy.pdf" className="btn-primary px-12 py-6 text-lg group bg-gold hover:bg-navy hover:text-white border-none shadow-2xl" download>
+                                <Download size={22} className="group-hover:bounce mr-2 inline" /> Download Full CV
                             </a>
-                            <Link to="/portfolio" className="btn-secondary px-8 py-3.5">
-                                See My Work <ExternalLink size={16} />
+                            <Link to="/#portfolio" className="text-navy hover:text-gold font-jakarta font-black text-xl flex items-center gap-3 transition-all group">
+                                Browse Case Studies <ExternalLink size={24} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                             </Link>
                         </div>
                     </FadeUp>

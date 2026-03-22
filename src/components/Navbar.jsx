@@ -5,10 +5,10 @@ import { Menu, X, ChevronDown, Calendar, Languages } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 const navLinks = [
-    { label: 'Home', path: '/' },
-    { label: 'About', path: '/about' },
-    { label: 'Services', path: '/services' },
-    { label: 'Portfolio', path: '/portfolio' }
+    { label: 'Home', path: '/#home' },
+    { label: 'About', path: '/#about' },
+    { label: 'Services', path: '/#services' },
+    { label: 'Portfolio', path: '/#portfolio' }
 ]
 
 const moreLinks = [
@@ -32,6 +32,29 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
+    const [activeSection, setActiveSection] = useState('home')
+
+    useEffect(() => {
+        const handleScrollSpy = () => {
+            const sections = ['home', 'about', 'services', 'portfolio', 'contact']
+            const scrollPos = window.scrollY + window.innerHeight / 3
+
+            let current = 'home'
+            for (const id of sections) {
+                const element = document.getElementById(id)
+                if (element && scrollPos >= element.offsetTop) {
+                    current = id
+                }
+            }
+            setActiveSection(current)
+        }
+
+        window.addEventListener('scroll', handleScrollSpy)
+        // Run once on mount to set initial state
+        handleScrollSpy()
+        return () => window.removeEventListener('scroll', handleScrollSpy)
+    }, [location.pathname])
+
     useEffect(() => {
         setMobileMenuOpen(false)
         setDropdownOpen(false)
@@ -50,7 +73,7 @@ export default function Navbar() {
     return (
         <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'glass-nav shadow-lg' : 'bg-navy/80 backdrop-blur-sm'}`}>
             <div className="container-content">
-                <div className="flex items-center justify-between h-16 md:h-18">
+                <div className="flex items-center justify-between h-16 md:h-20">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-2 group z-50">
                         <div className="w-8 h-8 rounded-lg bg-gold/20 border border-gold/40 flex items-center justify-center text-gold font-jakarta font-bold group-hover:bg-gold group-hover:text-navy transition-colors">
@@ -65,8 +88,11 @@ export default function Navbar() {
                             <Link
                                 key={link.path}
                                 to={link.path}
-                                className={`font-dm text-sm font-medium transition-colors duration-200 hover:text-gold ${location.pathname === link.path ? 'text-gold' : 'text-white/80'
-                                    }`}
+                                className={`font-dm text-sm font-medium transition-colors duration-200 hover:text-gold ${
+                                    (activeSection === link.path.replace('/#', '')) || 
+                                    (location.pathname === link.path && !location.hash)
+                                    ? 'text-gold' : 'text-white/80'
+                                }`}
                             >
                                 {t ? t(`nav.${link.label.toLowerCase()}`, link.label) : link.label}
                             </Link>
@@ -109,7 +135,7 @@ export default function Navbar() {
                     <div className="flex items-center gap-4">
                         <div className="hidden sm:flex items-center gap-4">
                             {/* Contact Link */}
-                            <Link to="/contact" className="text-sm font-jakarta font-medium text-white/80 hover:text-gold transition-colors">
+                            <Link to="/#contact" className="text-sm font-jakarta font-medium text-white/80 hover:text-gold transition-colors">
                                 {t ? t('nav.contact', 'Contact') : 'Contact'}
                             </Link>
 
@@ -126,13 +152,13 @@ export default function Navbar() {
                             </div>
 
                             {/* Language Toggle */}
-                            <button onClick={toggleLanguage} className="flex items-center gap-1.5 text-sm font-jakarta font-medium text-white/80 hover:text-gold transition-colors px-2 py-1 rounded-md hover:bg-slate-soft">
+                            <button onClick={toggleLanguage} className="flex items-center gap-1.5 text-sm font-jakarta font-medium text-white/80 hover:text-gold transition-colors px-2 py-1 rounded-md hover:bg-white/10">
                                 <Languages size={15} />
                                 <span>{i18n.language.startsWith('ar') ? 'EN' : 'AR'}</span>
                             </button>
 
                             {/* Desktop CTA */}
-                            <Link to="/contact" className="btn-primary py-2 px-5 text-sm whitespace-nowrap hidden lg:flex">
+                            <Link to="/#contact" className="btn-primary py-2 px-5 text-sm whitespace-nowrap hidden lg:flex">
                                 <Calendar size={14} className="mr-1.5" /> Book a Call
                             </Link>
                         </div>
@@ -196,7 +222,7 @@ export default function Navbar() {
                             </div>
 
                             <Link
-                                to="/contact"
+                                to="/#contact"
                                 onClick={closeMenus}
                                 className="w-full btn-primary justify-center mt-2 py-3.5"
                             >

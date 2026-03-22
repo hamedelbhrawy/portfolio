@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pipeline Debug</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0B1120; color: white; font-family: sans-serif; }
+.navbar-placeholder { position: fixed; top: 0; left: 0; right: 0; height: 80px; background: rgba(11,17,32,0.95); z-index: 100; display: flex; align-items: center; padding: 0 32px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.navbar-placeholder span { font-weight: bold; font-size: 18px; }
+.spacer { height: 200vh; display: flex; align-items: center; justify-content: center; padding-top: 80px; }
+.spacer h2 { font-size: 3rem; opacity: 0.2; }
+.app-wrapper { min-height: 100vh; overflow-x: hidden; position: relative; }
+.content-wrapper { padding-top: 80px; }
+
+/* Pipeline section */
+.pipeline-section { position: relative; height: 300vh; background: #0B1120; }
+.pipeline-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+.pipeline-header { padding: 96px 32px 24px; }
+.pipeline-header p { font-family: monospace; color: rgba(197,165,90,0.8); font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 12px; }
+.pipeline-header h2 { font-size: 2.5rem; font-weight: bold; }
+.panel-viewport { flex: 1; position: relative; }
+.panel-wrapper { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0 32px; will-change: transform, opacity; }
+.panel-card { max-width: 520px; width: 100%; text-align: center; border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 40px; backdrop-filter: blur(4px); }
+.panel-card .num { font-family: monospace; color: rgba(255,255,255,0.15); font-size: 3rem; font-weight: bold; }
+.panel-card .icon { font-size: 3rem; margin: 16px 0; }
+.panel-card h3 { font-size: 1.8rem; font-weight: bold; margin-bottom: 12px; }
+.panel-card .desc { color: #94a3b8; font-size: 1rem; line-height: 1.7; }
+.panel-card.red { background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); }
+.panel-card.teal { background: rgba(26,188,156,0.05); border-color: rgba(26,188,156,0.2); }
+.panel-card.gold { background: rgba(197,165,90,0.05); border-color: rgba(197,165,90,0.2); }
+.panel-card.red .icon { color: #f87171; }
+.panel-card.teal .icon { color: #1ABC9C; }
+.panel-card.gold .icon { color: #C5A55A; }
+
+.indicators { display: flex; justify-content: center; gap: 12px; padding-bottom: 16px; }
+.dot { height: 6px; border-radius: 999px; transition: all 0.3s; }
+.dot.active { width: 32px; background: #C5A55A; }
+.dot.inactive { width: 6px; background: rgba(255,255,255,0.2); }
+.progress-bar { height: 4px; background: rgba(255,255,255,0.05); }
+.progress-fill { height: 100%; background: linear-gradient(to right, #f87171, #1ABC9C, #C5A55A); transform-origin: 0% 50%; }
+
+.debug { position: fixed; top: 90px; right: 16px; background: rgba(0,0,0,0.8); padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; z-index: 200; }
+</style>
+</head>
+<body>
+<div class="app-wrapper">
+  <div class="navbar-placeholder"><span>Navbar (80px fixed)</span></div>
+  <div class="content-wrapper">
+    <div class="spacer"><h2>Content above (scroll down)</h2></div>
+
+    <section class="pipeline-section" id="pipeline">
+      <div class="pipeline-sticky">
+        <div class="pipeline-header">
+          <p>The Pipeline</p>
+          <h2>How I Build It</h2>
+        </div>
+        <div class="panel-viewport" id="panelViewport">
+          <!-- Panels injected by JS -->
+        </div>
+        <div class="indicators" id="indicators"></div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </section>
+
+    <div class="spacer"><h2>Content below</h2></div>
+  </div>
+</div>
+
+<div class="debug" id="debug">progress: 0</div>
+
+<script>
+const panels = [
+  { num: '01', icon: '🗄️', title: 'Ingestion', cls: 'red', desc: 'Connecting to scattered sources — APIs, ERP databases, legacy CSVs — pulling raw chaos into a centralized data lake.' },
+  { num: '02', icon: '⚙️', title: 'Processing', cls: 'teal', desc: 'Orchestrating transformation via Airflow & dbt. Cleaning, modeling, and structuring data for analytical performance.' },
+  { num: '03', icon: '📊', title: 'Serving', cls: 'gold', desc: 'Delivering sub-second queries with ClickHouse and executive clarity via Power BI automated reporting.' },
+];
+
+const viewport = document.getElementById('panelViewport');
+const indicatorsEl = document.getElementById('indicators');
+const progressFill = document.getElementById('progressFill');
+const debugEl = document.getElementById('debug');
+
+// Create panel elements
+panels.forEach((p, i) => {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'panel-wrapper';
+  wrapper.id = `panel-${i}`;
+  wrapper.innerHTML = `
+    <div class="panel-card ${p.cls}">
+      <div class="num">${p.num}</div>
+      <div class="icon">${p.icon}</div>
+      <h3>${p.title}</h3>
+      <p class="desc">${p.desc}</p>
+    </div>
+  `;
+  viewport.appendChild(wrapper);
+
+  const dot = document.createElement('div');
+  dot.className = 'dot inactive';
+  dot.id = `dot-${i}`;
+  indicatorsEl.appendChild(dot);
+});
+
+function getPanelState(index, progress) {
+  const count = panels.length;
+  const seg = 1 / count;
+  const start = index * seg;
+  const end = start + seg;
+  const enterEnd = start + seg * 0.15;
+  const exitStart = end - seg * 0.15;
+
+  if (index === 0) {
+    if (progress < exitStart) return { opacity: 1, x: 0 };
+    if (progress < end) { const t = (progress - exitStart) / (end - exitStart); return { opacity: 1 - t, x: -80 * t }; }
+    return { opacity: 0, x: -80 };
+  }
+  if (index === count - 1) {
+    if (progress < start) return { opacity: 0, x: 80 };
+    if (progress < enterEnd) { const t = (progress - start) / (enterEnd - start); return { opacity: t, x: 80 * (1 - t) }; }
+    return { opacity: 1, x: 0 };
+  }
+  if (progress < start) return { opacity: 0, x: 80 };
+  if (progress < enterEnd) { const t = (progress - start) / (enterEnd - start); return { opacity: t, x: 80 * (1 - t) }; }
+  if (progress < exitStart) return { opacity: 1, x: 0 };
+  if (progress < end) { const t = (progress - exitStart) / (end - exitStart); return { opacity: 1 - t, x: -80 * t }; }
+  return { opacity: 0, x: -80 };
+}
+
+const section = document.getElementById('pipeline');
+
+function update() {
+  const rect = section.getBoundingClientRect();
+  const sectionHeight = section.offsetHeight;
+  const vh = window.innerHeight;
+  const scrollable = sectionHeight - vh;
+  if (scrollable <= 0) return;
+  const scrolled = -rect.top;
+  const progress = Math.min(Math.max(scrolled / scrollable, 0), 1);
+
+  debugEl.textContent = `progress: ${progress.toFixed(3)} | rect.top: ${rect.top.toFixed(0)} | scrollable: ${scrollable.toFixed(0)}`;
+
+  panels.forEach((_, i) => {
+    const state = getPanelState(i, progress);
+    const el = document.getElementById(`panel-${i}`);
+    el.style.opacity = state.opacity;
+    el.style.transform = `translateX(${state.x}px)`;
+    el.style.pointerEvents = state.opacity < 0.5 ? 'none' : 'auto';
+
+    const dot = document.getElementById(`dot-${i}`);
+    const seg = 1 / panels.length;
+    const isActive = progress >= i * seg && (i === panels.length - 1 || progress < (i + 1) * seg);
+    dot.className = isActive ? 'dot active' : 'dot inactive';
+  });
+
+  progressFill.style.transform = `scaleX(${progress})`;
+}
+
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

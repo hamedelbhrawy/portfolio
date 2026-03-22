@@ -1,10 +1,9 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { Clock, ArrowRight, Tag } from 'lucide-react'
+import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion'
+import { Clock, ArrowRight, Tag, BookOpen, Share2, MessageSquare, ChevronDown, Zap, Lightbulb, PieChart } from 'lucide-react'
 import PageHero from '../components/PageHero'
 import FadeUp from '../components/FadeUp'
-
-const categories = ['All', 'Platform Architecture', 'DAX & Power BI', 'Analytics Leadership', 'Data Governance', 'Career & Growth']
 
 const posts = [
     {
@@ -15,6 +14,7 @@ const posts = [
         date: 'Feb 2025',
         excerpt: 'The dashboard is the easy part. Executives see the dashboard. Engineers build the data model. Here\'s why the foundation determines everything — and how to build it right.',
         featured: true,
+        stats: { views: '1.2k', shares: '45' }
     },
     {
         id: 2,
@@ -22,9 +22,10 @@ const posts = [
         category: 'Platform Architecture',
         readTime: '8 min',
         date: 'Jan 2025',
-        excerpt: 'The technical and organizational story behind migrating from SQL Server to ClickHouse — and what the 45-minute to 10-second journey actually looked like from inside.',
+        excerpt: 'The technical and organizational story behind migrating from SQL Server to ClickHouse — and what the 45-minute to 10-second journey actually looked like.',
         featured: true,
-        slug: 'clickhouse-vs-sql-server-migration'
+        slug: 'clickhouse-vs-sql-server-migration',
+        stats: { views: '2.4k', shares: '182' }
     },
     {
         id: 3,
@@ -32,9 +33,10 @@ const posts = [
         category: 'Analytics Leadership',
         readTime: '7 min',
         date: 'Dec 2024',
-        excerpt: 'Most customer analytics tutorials ignore the Hijri calendar. In Saudi retail, that\'s a fatal mistake. Here\'s how we unified 2.7M records AND respected the Islamic calendar.',
+        excerpt: 'Most customer analytics tutorials ignore the Hijri calendar. In Saudi retail, that\'s a fatal mistake. Here\'s how we unified 2.7M records.',
         featured: false,
-        slug: 'customer-360-saudi-retail'
+        slug: 'customer-360-saudi-retail',
+        stats: { views: '800', shares: '12' }
     },
     {
         id: 4,
@@ -42,129 +44,182 @@ const posts = [
         category: 'DAX & Power BI',
         readTime: '10 min',
         date: 'Nov 2024',
-        excerpt: '353 DAX measures across 4 companies taught me that 90% of business questions can be answered with 10 core patterns. Here they are, with real examples.',
+        excerpt: '353 DAX measures across 4 companies taught me that 90% of business questions can be answered with 10 core patterns.',
         featured: false,
-        slug: '10-dax-patterns-production-report'
-    },
-    {
-        id: 5,
-        title: 'How to Build an Analytics Team From Scratch in the Middle East',
-        category: 'Analytics Leadership',
-        readTime: '9 min',
-        date: 'Oct 2024',
-        excerpt: 'Cultural context matters. Hiring data people in Saudi Arabia is different from Silicon Valley. Here\'s what I learned building a 6-person analytics function from zero.',
-        featured: false,
-    },
-    {
-        id: 6,
-        title: 'SDAIA & PDPL: A Practical Data Governance Guide for Saudi Companies',
-        category: 'Data Governance',
-        readTime: '12 min',
-        date: 'Sep 2024',
-        excerpt: 'The Personal Data Protection Law is in effect. Here\'s a 10-pillar framework to make your data governance practices compliant — and actually useful.',
-        featured: false,
+        slug: '10-dax-patterns-production-report',
+        stats: { views: '1.5k', shares: '94' }
     },
 ]
 
-export default function Blog() {
-    const [activeFilter, setActiveFilter] = useState('All')
-    const [emailVal, setEmailVal] = useState('')
+function ArticleCard({ post, index }) {
+    const ref = useRef(null)
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ["start 90%", "center center"]
+    })
 
-    const filtered = activeFilter === 'All' ? posts : posts.filter((p) => p.category === activeFilter)
+    const y = useTransform(scrollYProgress, [0, 1], [100, 0])
+    const opacity = useTransform(scrollYProgress, [0, 0.5], [0, 1])
+    const scale = useTransform(scrollYProgress, [0, 1], [0.95, 1])
 
     return (
-        <main>
-            <PageHero
-                title="Insights"
-                subtitle="Practical frameworks from 6+ years of building data platforms — no fluff, all substance."
-            />
+        <motion.article 
+            ref={ref}
+            style={{ y, opacity, scale }}
+            className={`group relative bg-white rounded-[2.5rem] p-8 md:p-12 border border-slate-100 shadow-xl hover:shadow-2xl transition-all duration-700 overflow-hidden flex flex-col ${post.featured ? 'md:col-span-2' : ''}`}
+        >
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+            
+            <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-4">
+                    <span className="tag-gold font-mono text-[10px]">{post.category}</span>
+                    <span className="text-slate-400 text-[10px] font-mono font-bold flex items-center gap-1.5 uppercase tracking-widest">
+                        <Clock size={12} /> {post.readTime}
+                    </span>
+                </div>
+                <div className="flex gap-4 text-slate-300">
+                    <div className="flex items-center gap-1.5">
+                        <Share2 size={14} />
+                        <span className="text-[10px] font-bold font-mono uppercase">{post.stats.shares}</span>
+                    </div>
+                </div>
+            </div>
 
-            {/* ─── FILTER TABS ──────────────────────────────── */}
-            <section className="bg-white border-b border-slate-200 sticky top-16 z-40">
-                <div className="container-content py-4">
-                    <div className="flex gap-2 overflow-x-auto pb-1">
-                        {categories.map((cat) => (
-                            <button
-                                key={cat}
-                                onClick={() => setActiveFilter(cat)}
-                                className={`shrink-0 px-4 py-2 rounded-lg text-sm font-jakarta font-semibold transition-all duration-200 ${activeFilter === cat
-                                    ? 'bg-gold text-navy shadow-md shadow-gold/20'
-                                    : 'bg-slate-soft text-charcoal hover:bg-slate-200'
-                                    }`}
-                            >
-                                {cat}
-                            </button>
+            <h2 className={`font-jakarta font-black text-navy leading-[1.1] mb-6 group-hover:text-gold transition-colors ${post.featured ? 'text-3xl md:text-5xl' : 'text-2xl md:text-3xl'}`}>
+                {post.title}
+            </h2>
+            
+            <p className="text-charcoal/70 font-dm text-lg leading-relaxed mb-10 line-clamp-3">
+                {post.excerpt}
+            </p>
+
+            <div className="mt-auto pt-8 border-t border-slate-50 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-jakarta font-black text-xs">HB</div>
+                    <div>
+                        <p className="text-navy font-black text-sm leading-none mb-1">Hamed Elbhrawy</p>
+                        <p className="text-slate-400 font-mono text-[10px] font-bold uppercase tracking-widest">{post.date}</p>
+                    </div>
+                </div>
+                
+                {post.slug ? (
+                    <Link to={`/blog/${post.slug}`} className="w-14 h-14 rounded-full bg-navy text-white flex items-center justify-center group-hover:bg-gold transition-all shadow-lg group-hover:translate-x-2">
+                        <ArrowRight size={24} />
+                    </Link>
+                ) : (
+                    <span className="text-slate-400 text-xs font-jakarta font-bold px-6 py-3 bg-slate-50 rounded-full border border-slate-100">Coming Soon</span>
+                )}
+            </div>
+        </motion.article>
+    )
+}
+
+export default function Blog() {
+    const containerRef = useRef(null)
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start start", "end end"]
+    })
+
+    const streamOpacity = useTransform(scrollYProgress, [0, 0.1, 0.9, 1], [0.3, 0.1, 0.1, 0])
+
+    return (
+        <main className="bg-white selection:bg-gold selection:text-navy" ref={containerRef}>
+            {/* ─── INSIGHT STREAM HERO ──────────────────────── */}
+            <section className="relative h-screen flex items-center justify-center overflow-hidden bg-navy">
+                <div className="absolute inset-0 z-0">
+                    <motion.div 
+                        style={{ opacity: streamOpacity }}
+                        className="absolute inset-0 opacity-20 pointer-events-none"
+                    >
+                        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,rgba(196,160,82,0.1)_50%,transparent_100%)] bg-[length:100%_400px] animate-data-stream" />
+                        <div className="h-full w-full grid grid-cols-12 gap-4">
+                            {[...Array(12)].map((_, i) => (
+                                <div key={i} className="h-full w-px bg-white/5 relative">
+                                    <motion.div 
+                                        animate={{ y: ["0%", "100%"], opacity: [0, 1, 0] }}
+                                        transition={{ duration: Math.random() * 5 + 3, repeat: Infinity, ease: "linear", delay: Math.random() * 5 }}
+                                        className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-transparent via-gold/30 to-transparent"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
+                </div>
+
+                <div className="container-content relative z-10 text-center pt-24">
+                    <FadeUp>
+                        <div className="mb-12 flex justify-center">
+                            <div className="w-24 h-24 rounded-[2.5rem] bg-gold/10 border border-gold/20 flex items-center justify-center text-gold shadow-[0_0_50px_rgba(196,160,82,0.2)]">
+                                <BookOpen size={48} strokeWidth={1} />
+                            </div>
+                        </div>
+                        <h1 className="text-6xl md:text-9xl font-jakarta font-black text-white tracking-tighter leading-[0.8] mb-12">
+                            The Data <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-white">Signal.</span>
+                        </h1>
+                        <p className="text-slate-400 font-dm text-2xl md:text-3xl max-w-2xl mx-auto mb-16 leading-relaxed">
+                            Hard-won insights from the trenches of modern data architecture. 
+                        </p>
+                        <motion.div 
+                            animate={{ y: [0, 10, 0] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="text-gold flex flex-col items-center gap-4 cursor-pointer"
+                            onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+                        >
+                            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.4em]">Scroll to Decode</span>
+                            <ChevronDown size={24} />
+                        </motion.div>
+                    </FadeUp>
+                </div>
+            </section>
+
+            {/* ─── THE WATERFALL: ARTICLE REVEAL ───────────── */}
+            <section className="py-20 md:py-40 bg-slate-50 relative">
+                <div className="container-content">
+                    <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+                        {posts.map((post, i) => (
+                            <ArticleCard key={post.id} post={post} index={i} />
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* ─── BLOG GRID ────────────────────────────────── */}
-            <section className="section-light">
+            {/* ─── KNOWLEDGE GRAPH OVERVIEW ─────────────────── */}
+            <section className="py-40 bg-white">
                 <div className="container-content">
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filtered.map((post, i) => (
-                            <FadeUp key={post.id} delay={i * 0.05}>
-                                <article className={`card h-full flex flex-col group ${post.featured ? 'border-gold/20' : ''}`}>
-                                    {post.featured && (
-                                        <span className="tag-gold mb-3 w-fit">Featured</span>
-                                    )}
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <span className="tag-teal">{post.category}</span>
-                                        <span className="text-slate-muted text-xs font-mono flex items-center gap-1">
-                                            <Clock size={11} /> {post.readTime} read
-                                        </span>
-                                    </div>
-                                    <h2 className="font-jakarta font-bold text-navy text-base leading-snug mb-3 flex-1">
-                                        {post.title}
-                                    </h2>
-                                    <p className="text-charcoal/70 font-dm text-sm leading-relaxed mb-4">{post.excerpt}</p>
-                                    <div className="flex items-center justify-between mt-auto">
-                                        <span className="text-slate-muted text-xs font-mono">{post.date}</span>
-                                        {post.slug ? (
-                                            <Link to={`/blog/${post.slug}`} className="text-gold text-xs font-jakarta font-semibold hover:underline flex items-center gap-1">
-                                                Read More <ArrowRight size={11} />
-                                            </Link>
-                                        ) : (
-                                            <span className="text-slate-400 text-xs font-jakarta font-medium flex items-center gap-1">
-                                                Coming Soon
-                                            </span>
-                                        )}
-                                    </div>
-                                </article>
-                            </FadeUp>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* ─── NEWSLETTER SUBSCRIBE ─────────────────────── */}
-            <section className="section-dark" id="newsletter">
-                <div className="container-content">
-                    <div className="max-w-xl mx-auto text-center">
+                    <div className="bg-navy rounded-[4rem] p-12 md:p-32 text-center relative overflow-hidden group shadow-3xl">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(196,160,82,0.15),transparent_60%)]" />
+                        
                         <FadeUp>
-                            <div className="font-mono text-gold text-xs uppercase tracking-widest mb-3">The Data Signal</div>
-                            <h2 className="section-heading-white mb-3">Monthly Insights on Data Platform Architecture</h2>
-                            <p className="text-slate-muted font-dm mb-8">
-                                No fluff. One practical framework, one real case study, subscriber-only insights every month.
+                            <div className="mb-12 flex justify-center gap-8">
+                                <div className="p-6 rounded-[2rem] bg-white/5 border border-white/10 text-gold hover:bg-gold/10 transition-colors">
+                                    <Zap size={40} strokeWidth={1} />
+                                </div>
+                                <div className="p-6 rounded-[2rem] bg-white/5 border border-white/10 text-teal hover:bg-teal/10 transition-colors">
+                                    <Lightbulb size={40} strokeWidth={1} />
+                                </div>
+                                <div className="p-6 rounded-[2rem] bg-white/5 border border-white/10 text-blue-400 hover:bg-blue-400/10 transition-colors">
+                                    <PieChart size={40} strokeWidth={1} />
+                                </div>
+                            </div>
+                            <h2 className="text-5xl md:text-8xl font-jakarta font-black text-white mb-12 tracking-tighter leading-[0.85]">
+                                Subscribe to <br /><span className="text-gold">Signal.</span>
+                            </h2>
+                            <p className="text-slate-400 font-dm text-xl md:text-2xl max-w-2xl mx-auto mb-20 leading-relaxed">
+                                Join 500+ data engineers and analytics leaders. No fluff, just production-ready architectural frameworks.
                             </p>
-                            <form
-                                className="flex flex-col sm:flex-row gap-3"
-                                onSubmit={(e) => { e.preventDefault(); setEmailVal(''); alert('Thank you for subscribing!') }}
-                            >
-                                <input
-                                    type="email"
-                                    placeholder="your@email.com"
-                                    value={emailVal}
-                                    onChange={(e) => setEmailVal(e.target.value)}
-                                    className="input-field flex-1 bg-navy-light border-white/20 text-white placeholder-slate-muted"
-                                    required
+                            
+                            <form className="max-w-xl mx-auto flex flex-col sm:flex-row gap-6">
+                                <input 
+                                    type="email" 
+                                    placeholder="Enter your email" 
+                                    className="flex-1 h-20 bg-white/5 border border-white/10 rounded-[1.5rem] px-8 text-white font-jakarta text-lg focus:outline-none focus:border-gold transition-colors"
                                 />
-                                <button type="submit" className="btn-primary shrink-0 justify-center">
-                                    Subscribe
+                                <button className="h-20 px-12 bg-white text-navy font-jakarta font-black text-xl rounded-[1.5rem] hover:bg-gold hover:text-navy transition-all shadow-2xl">
+                                    Join
                                 </button>
                             </form>
-                            <p className="text-slate-muted text-xs mt-4 font-mono">No spam. Unsubscribe anytime.</p>
+                            <p className="text-slate-500 font-mono text-[10px] mt-8 uppercase tracking-widest font-bold">Monthly Signal • Zero Spam • Unsubscribe Anytime</p>
                         </FadeUp>
                     </div>
                 </div>

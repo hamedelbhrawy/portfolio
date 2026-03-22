@@ -4,7 +4,7 @@ import {
     ArrowRight, Download, Zap, Users, Code, Database,
     BarChart3, Clock
 } from 'lucide-react'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import TypedText from '../components/TypedText'
 import AnimatedCounter from '../components/AnimatedCounter'
 import TechMarquee from '../components/TechMarquee'
@@ -39,11 +39,13 @@ const ScrubbingText = ({ text, progress, highlightWords = [] }) => {
     )
 }
 
-// Scene 3 — Horizontal scrolling pipeline
+// Scene 3 — Pipeline panels using direct DOM updates (no React re-renders on scroll)
 const PipelineScroll = () => {
-    const ref = useRef(null)
-    const { scrollYProgress } = useScroll({ target: ref })
-    const x = useTransform(scrollYProgress, [0, 1], ['0%', '-66.66%'])
+    const sectionRef = useRef(null)
+    const panelRefs = useRef([])
+    const dotRefs = useRef([])
+    const barRef = useRef(null)
+
 
     const panels = [
         {
@@ -59,32 +61,139 @@ const PipelineScroll = () => {
             desc: 'Delivering sub-second queries with ClickHouse and executive clarity via Power BI automated reporting.'
         },
     ]
+    const count = panels.length
+
+    useEffect(() => {
+        const getPanelState = (index, progress) => {
+            const seg = 1 / count
+            const start = index * seg
+            const end = start + seg
+            const enterEnd = start + seg * 0.15
+            const exitStart = end - seg * 0.15
+
+            if (index === 0) {
+                if (progress < exitStart) return { opacity: 1, x: 0 }
+                if (progress < end) { const t = (progress - exitStart) / (end - exitStart); return { opacity: 1 - t, x: -100 * t } }
+                return { opacity: 0, x: -100 }
+            }
+            if (index === count - 1) {
+                if (progress < start) return { opacity: 0, x: 100 }
+                if (progress < enterEnd) { const t = (progress - start) / (enterEnd - start); return { opacity: t, x: 100 * (1 - t) } }
+                return { opacity: 1, x: 0 }
+            }
+            if (progress < start) return { opacity: 0, x: 100 }
+            if (progress < enterEnd) { const t = (progress - start) / (enterEnd - start); return { opacity: t, x: 100 * (1 - t) } }
+            if (progress < exitStart) return { opacity: 1, x: 0 }
+            if (progress < end) { const t = (progress - exitStart) / (end - exitStart); return { opacity: 1 - t, x: -100 * t } }
+            return { opacity: 0, x: -100 }
+        }
+
+        let rafId = null
+        const update = () => {
+            if (!sectionRef.current) return
+            const rect = sectionRef.current.getBoundingClientRect()
+            const sectionHeight = sectionRef.current.offsetHeight
+            const viewportHeight = window.innerHeight
+            const scrollable = sectionHeight - viewportHeight
+            if (scrollable <= 0) return
+            const scrolled = -rect.top
+            const progress = Math.min(Math.max(scrolled / scrollable, 0), 1)
+
+
+
+            // Update panels directly via DOM
+            for (let i = 0; i < count; i++) {
+                const el = panelRefs.current[i]
+                if (!el) continue
+                const state = getPanelState(i, progress)
+                el.style.opacity = state.opacity
+                el.style.transform = `translateX(${state.x}px)`
+                el.style.pointerEvents = state.opacity < 0.5 ? 'none' : 'auto'
+            }
+
+            // Update dots
+            for (let i = 0; i < count; i++) {
+                const dot = dotRefs.current[i]
+                if (!dot) continue
+                const seg = 1 / count
+                const isActive = progress >= i * seg && (i === count - 1 || progress < (i + 1) * seg)
+                dot.style.width = isActive ? '32px' : '6px'
+                dot.style.background = isActive ? '#C5A55A' : 'rgba(255,255,255,0.2)'
+            }
+
+            // Update progress bar
+            if (barRef.current) {
+                barRef.current.style.transform = `scaleX(${progress})`
+            }
+        }
+
+        const handleScroll = () => {
+            if (rafId) cancelAnimationFrame(rafId)
+            rafId = requestAnimationFrame(update)
+        }
+
+        window.addEventListener('scroll', handleScroll, { passive: true })
+        update() // initial
+        return () => {
+            window.removeEventListener('scroll', handleScroll)
+            if (rafId) cancelAnimationFrame(rafId)
+        }
+    }, [count])
 
     return (
-        <section ref={ref} className="relative h-[300vh] bg-navy">
-            <div className="sticky top-0 h-screen flex items-center overflow-hidden">
-                <div className="absolute top-16 left-8 lg:top-20 lg:left-16 z-20">
+        <section ref={sectionRef} className="relative bg-navy" style={{ height: '300vh' }}>
+            {/* sticky top-16/top-20 to sit below the fixed navbar */}
+            <div className="sticky top-16 md:top-20 overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 4rem)' }}>
+
+
+                <div className="pt-8 pb-4 px-8 lg:pt-10 lg:px-16">
                     <p className="font-mono text-gold/80 text-[11px] tracking-[0.25em] uppercase mb-3">The Pipeline</p>
-                    <h2 className="font-jakarta text-3xl md:text-5xl text-white font-bold">How I Build It</h2>
+                    <h2 className="font-jakarta text-3xl md:text-5xl text-white font-bold tracking-tight">How I Build It</h2>
                 </div>
 
-                <motion.div style={{ x }} className="flex w-[300vw] h-full">
+                <div className="flex-1 relative">
                     {panels.map((p, i) => (
-                        <div key={i} className="w-[100vw] h-full flex items-center justify-center px-8">
-                            <div className={`max-w-lg text-center ${p.bg} ${p.border} border rounded-3xl p-12 backdrop-blur-sm`}>
-                                <p className="font-mono text-white/20 text-7xl font-bold mb-6">{p.num}</p>
-                                <p.icon size={56} className={`${p.color} mx-auto mb-6`} />
-                                <h3 className="font-jakarta text-3xl text-white font-bold mb-4">{p.title}</h3>
-                                <p className="font-dm text-lg text-slate-400 leading-relaxed">{p.desc}</p>
+                        <div
+                            key={i}
+                            ref={el => panelRefs.current[i] = el}
+                            className="absolute inset-0 flex items-center justify-center px-8"
+                            style={{ opacity: i === 0 ? 1 : 0, transform: i === 0 ? 'translateX(0px)' : 'translateX(100px)' }}
+                        >
+                            <div className={`max-w-xl w-full text-center ${p.bg} ${p.border} border rounded-3xl px-8 py-8 md:px-10 md:py-10 backdrop-blur-sm`}>
+                                <div className="flex items-center justify-center gap-4 mb-4">
+                                    <p className="font-mono text-white/20 text-4xl md:text-5xl font-bold">{p.num}</p>
+                                    <p.icon size={36} className={p.color} />
+                                </div>
+                                <h3 className="font-jakarta text-2xl md:text-3xl text-white font-bold mb-3">{p.title}</h3>
+                                <p className="font-dm text-base md:text-lg text-slate-400 leading-relaxed">{p.desc}</p>
                             </div>
                         </div>
                     ))}
-                </motion.div>
+                </div>
+
+                {/* Step indicators */}
+                <div className="flex justify-center gap-3 pb-4">
+                    {panels.map((_, i) => (
+                        <div
+                            key={i}
+                            ref={el => dotRefs.current[i] = el}
+                            className="h-1.5 rounded-full"
+                            style={{
+                                width: i === 0 ? '32px' : '6px',
+                                background: i === 0 ? '#C5A55A' : 'rgba(255,255,255,0.2)',
+                                transition: 'width 0.3s, background 0.3s',
+                            }}
+                        />
+                    ))}
+                </div>
 
                 {/* Progress bar */}
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/5">
-                    <motion.div style={{ scaleX: scrollYProgress, transformOrigin: '0% 50%' }}
-                        className="h-full bg-gradient-to-r from-red-400 via-teal to-gold" />
+                <div className="h-1 bg-white/5">
+                    <div
+                        ref={barRef}
+                        className="h-full bg-gradient-to-r from-red-400 via-teal to-gold"
+                        style={{ transform: 'scaleX(0)', transformOrigin: '0% 50%' }}
+                    />
                 </div>
             </div>
         </section>
@@ -228,7 +337,7 @@ export default function Home() {
             {/* ═══════════════════════════════════════════════════════
                 SCENE 1 — THE DEEP DIVE HERO
                 ═══════════════════════════════════════════════════════ */}
-            <section ref={heroRef} className="relative h-[200vh]">
+            <section ref={heroRef} className="relative h-[160vh]">
                 <div className="sticky top-0 h-screen overflow-hidden flex items-center bg-navy">
                     {/* Scaling grid background */}
                     <motion.div style={{ scale: heroScale }}
@@ -269,7 +378,7 @@ export default function Home() {
                                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
                                     className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                                     <MagneticButton className="w-full sm:w-auto flex">
-                                        <Link to="/portfolio" className="btn-primary w-full text-base px-8 py-4 shadow-[0_0_30px_rgba(197,165,90,0.3)]">
+                                        <Link to="/#portfolio" className="btn-primary w-full text-base px-8 py-4 shadow-[0_0_30px_rgba(197,165,90,0.3)]">
                                             Explore My Work <ArrowRight size={18} />
                                         </Link>
                                     </MagneticButton>
@@ -337,10 +446,10 @@ export default function Home() {
             {/* ═══════════════════════════════════════════════════════
                 SCENE 2 — THE PROBLEM (Text Scrub)
                 ═══════════════════════════════════════════════════════ */}
-            <section ref={problemRef} className="h-[200vh] relative z-10 bg-navy">
-                <div className="sticky top-0 h-screen flex items-center justify-center">
+            <section ref={problemRef} className="h-[150vh] relative z-10 bg-navy">
+                <div className="sticky top-0 h-screen flex flex-col items-center justify-start pt-52 pb-16">
                     <div className="container-content">
-                        <div className="max-w-4xl mx-auto text-center">
+                        <div className="max-w-4xl mx-auto text-center px-4">
                             <h2 className="font-jakarta font-bold text-4xl md:text-6xl lg:text-7xl text-white mb-10 leading-tight">
                                 <ScrubbingText text="Data is abundant. Clarity is rare." progress={problemProgress}
                                     highlightWords={['abundant', 'Clarity', 'rare']} />
@@ -425,15 +534,14 @@ export default function Home() {
                                     ))}
                                 </ul>
                                 <MagneticButton>
-                                    <Link to="/portfolio" className="btn-primary">
+                                    <Link to="/#portfolio" className="btn-primary">
                                         View Full Case Study <ArrowRight size={18} />
                                     </Link>
                                 </MagneticButton>
                             </FadeUp>
                         </div>
 
-                        {/* Scroll-Linked Animation Container */}
-                        <div className="relative h-[150vh]">
+                        <div className="relative h-[100vh] -mt-10">
                             <TransformationVisualizer />
                         </div>
                     </div>
@@ -450,7 +558,7 @@ export default function Home() {
                             <p className="text-slate-muted font-mono text-xs uppercase tracking-widest mb-2">The Execution</p>
                             <h2 className="section-heading mb-0">Architectures I've Built</h2>
                         </div>
-                        <Link to="/portfolio" className="hidden md:flex items-center gap-2 text-gold text-sm font-jakarta font-semibold hover:gap-3 transition-all">
+                        <Link to="/#portfolio" className="hidden md:flex items-center gap-2 text-gold text-sm font-jakarta font-semibold hover:gap-3 transition-all">
                             View All Projects <ArrowRight size={14} />
                         </Link>
                     </FadeUp>
@@ -458,7 +566,7 @@ export default function Home() {
                     {/* Stacking cards container */}
                     <div className="relative">
                         {projects.map((p, i) => (
-                            <div key={i} className="sticky mb-8" style={{ top: `${140 + i * 40}px` }}>
+                            <div key={i} className="sticky mb-12" style={{ top: `${160 + i * 50}px` }}>
                                 <FadeUp delay={i * 0.1}>
                                     <div className="card group flex flex-col md:flex-row items-start gap-6 bg-white shadow-xl border border-slate-100"
                                         style={{ transform: `scale(${1 - i * 0.02})` }}>
@@ -470,7 +578,7 @@ export default function Home() {
                                             <h3 className="font-jakarta font-bold text-xl text-navy mb-1">{p.title}</h3>
                                             <p className="text-slate-muted text-sm font-mono mb-2">{p.company}</p>
                                             <p className="text-charcoal/80 font-dm text-sm leading-relaxed">{p.impact}</p>
-                                            <Link to="/portfolio" className="mt-4 inline-flex items-center gap-1.5 text-gold text-sm font-jakarta font-semibold hover:gap-3 transition-all">
+                                            <Link to="/#portfolio" className="mt-4 inline-flex items-center gap-1.5 text-gold text-sm font-jakarta font-semibold hover:gap-3 transition-all">
                                                 View Project <ArrowRight size={13} />
                                             </Link>
                                         </div>
@@ -481,7 +589,7 @@ export default function Home() {
                     </div>
 
                     <FadeUp className="text-center mt-10 md:hidden">
-                        <Link to="/portfolio" className="btn-outline-gold">
+                        <Link to="/#portfolio" className="btn-outline-gold">
                             View All Projects <ArrowRight size={14} />
                         </Link>
                     </FadeUp>
@@ -541,7 +649,7 @@ export default function Home() {
                             <span className="text-teal">scalable pipelines</span>, and{' '}
                             <span className="text-blue-electric">executive-ready dashboards</span>."
                         </blockquote>
-                        <Link to="/services" className="btn-primary text-base px-8 py-4">
+                        <Link to="/#services" className="btn-primary text-base px-8 py-4">
                             Explore Services <ArrowRight size={16} />
                         </Link>
                     </FadeUp>

@@ -124,7 +124,7 @@ export default function Media() {
                             <h3 className="font-jakarta font-semibold text-navy mb-2">Coming Soon</h3>
                             <p className="text-slate-muted font-dm text-sm">
                                 Speaking engagements will be listed here as they're confirmed.{' '}
-                                <Link to="/contact" className="text-gold hover:underline">Inquire below</Link> to book for your event.
+                                <Link to="/#contact" className="text-gold hover:underline">Inquire below</Link> to book for your event.
                             </p>
                         </div>
                     </FadeUp>

@@ -169,7 +169,7 @@ export default function CaseStudies() {
                                 <p className="text-charcoal/70 font-dm mb-6">
                                     If your team is spending more time fixing data than analyzing it, let's talk about what a modern data platform could do for your organization.
                                 </p>
-                                <Link to="/contact" className="btn-primary">
+                                <Link to="/#contact" className="btn-primary">
                                     Let's Talk <ArrowRight size={14} />
                                 </Link>
                             </div>

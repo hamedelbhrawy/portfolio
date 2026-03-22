@@ -3,11 +3,11 @@ import { Linkedin, Github, Mail, MapPin, Calendar, ArrowRight } from 'lucide-rea
 
 const quickLinks = [
     { label: 'Home', path: '/' },
-    { label: 'About', path: '/about' },
-    { label: 'Services', path: '/services' },
-    { label: 'Portfolio', path: '/portfolio' },
+    { label: 'About', path: '/#about' },
+    { label: 'Services', path: '/#services' },
+    { label: 'Portfolio', path: '/#portfolio' },
     { label: 'Blog', path: '/blog' },
-    { label: 'Contact', path: '/contact' },
+    { label: 'Contact', path: '/#contact' },
 ]
 
 const resourceLinks = [
@@ -29,7 +29,7 @@ export default function Footer() {
                     <p className="text-slate-muted font-dm text-lg mb-8 max-w-xl mx-auto">
                         Let's discuss how a modern data platform can transform your analytics.
                     </p>
-                    <Link to="/contact" className="btn-primary text-base px-8 py-4">
+                    <Link to="/#contact" className="btn-primary text-base px-8 py-4">
                         Start a Conversation <ArrowRight size={16} />
                     </Link>
                 </div>
@@ -110,7 +110,7 @@ export default function Footer() {
                                 </a>
                             </li>
                         </ul>
-                        <Link to="/contact" className="btn-primary text-sm py-2 px-4 mt-5 inline-flex">
+                        <Link to="/#contact" className="btn-primary text-sm py-2 px-4 mt-5 inline-flex">
                             <Calendar size={14} /> Book a Call
                         </Link>
                     </div>
